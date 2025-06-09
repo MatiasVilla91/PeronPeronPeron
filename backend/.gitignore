@@ -1,0 +1,57 @@
+# Node modules
+node_modules/
+
+# Entornos
+.env
+.env.*
+*.env
+
+# Archivos de logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Archivos del sistema / IDEs
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+
+# Archivos de compilación
+dist/
+build/
+
+# Archivos temporales
+*.tmp
+*.temp
+*.bak
+
+# Datos locales o privados
+data/pdfs/
+data/*.pdf
+*.sqlite
+*.db
+
+# Archivos específicos de la app
+*.pem
+*.key
+*.crt
+
+# Cache
+.cache/
+.next/
+out/
+
+# Test
+coverage/
+__tests__/
+
+# Archivos de sistema de Windows/macOS
+ehthumbs.db
+desktop.ini
+
+# Otros
+*.tgz
+*.log
