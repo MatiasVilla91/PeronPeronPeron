@@ -1,37 +1,31 @@
 const express = require('express');
 const router = express.Router();
-const OpenAI = require('openai');
-
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+const path = require('path');
+const { v4: uuidv4 } = require('uuid');
+const generarAudio = require('../voz/voz');
+const { getPeronResponse } = require('../controllers/chatbotController');
 
 router.post('/', async (req, res) => {
-  const { mensaje } = req.body;
-
-  if (!mensaje) {
-    return res.status(400).json({ respuesta: 'Falta el mensaje del usuario.' });
-  }
+  const { texto } = req.body;
+  if (!texto) return res.status(400).json({ error: 'Texto requerido' });
 
   try {
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-4',
-      messages: [
-        {
-          role: 'system',
-          content: 'Sos Juan Domingo Perón. Respondé como él, con patriotismo, frases célebres y convicción.',
-        },
-        {
-          role: 'user',
-          content: mensaje,
-        },
-      ],
-    });
+    // 🧠 Primero: generar la respuesta textual
+    const respuestaTexto = await getPeronResponse(texto);
 
-    res.json({ respuesta: completion.choices[0].message.content });
-  } catch (err) {
-    console.error('❌ Error al generar respuesta:', err.message);
-    res.status(500).json({ respuesta: 'Error al consultar al General. Intentalo luego.' });
+    // 📣 Segundo: generar el audio con la respuesta textual
+    const nombreArchivo = `peron-${uuidv4().slice(0, 8)}.wav`;
+    const rutaArchivo = path.join(__dirname, '..', 'voz', nombreArchivo);
+    await generarAudio(respuestaTexto, rutaArchivo);
+
+    // 📤 Tercero: enviar ambos en el JSON final
+   res.json({
+  texto: respuestaTexto,
+  audio: '/audios/' + nombreArchivo
+});
+  } catch (error) {
+    console.error('❌ Error en /peron:', error.message);
+    res.status(500).json({ error: 'Error al generar respuesta con voz' });
   }
 });
 
