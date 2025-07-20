@@ -1,6 +1,5 @@
 import { useState } from 'react';
 
-
 const ChatBot = () => {
   const [input, setInput] = useState('');
   const [chat, setChat] = useState([
@@ -18,31 +17,66 @@ const ChatBot = () => {
       const res = await fetch('http://localhost:3000/api/peron', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ mensaje: input })
+        body: JSON.stringify({ texto: input })
       });
+
       const data = await res.json();
 
-      setChat([...nuevoChat, { role: 'peron', text: data.respuesta }]);
+      // Mostrar texto primero
+      setChat([
+        ...nuevoChat,
+        { role: 'peron', text: data.texto, audio: data.audio || null }
+      ]);
+
+      // Reproducir voz después
+      if (data.audio) {
+        const audio = new Audio(`http://localhost:3000${data.audio}`);
+        audio.play().catch(err => console.error('🎧 No se pudo reproducir el audio:', err));
+      }
+
     } catch (err) {
-      setChat([...nuevoChat, { role: 'peron', text: '⚠️ Error al contactar al General.' }]);
+      setChat([
+        ...nuevoChat,
+        { role: 'peron', text: '❌ Error al contactar al General.' }
+      ]);
     }
   };
 
   return (
-    <div style={{ maxWidth: 600, margin: 'auto' }}>
+    <div style={{ maxWidth: 600, margin: 'auto', padding: '1rem' }}>
       <h2>Chat con Perón 🇦🇷</h2>
-      <div style={{ height: '300px', overflowY: 'auto', border: '1px solid gray', padding: 10, marginBottom: 10 }}>
-        {chat.map((msg, i) => (
-          <p key={i}><strong>{msg.role === 'peron' ? 'Perón:' : 'Vos:'}</strong> {msg.text}</p>
-        ))}
-      </div>
+
+      {chat.map((msg, i) => (
+        <div key={i} style={{ marginBottom: '1rem' }}>
+          <p><strong>{msg.role === 'peron' ? 'Perón:' : 'Vos:'}</strong> {msg.text}</p>
+          {msg.audio && (
+            <button
+              onClick={() => {
+                const audio = new Audio(`http://localhost:3000${msg.audio}`);
+                audio.play();
+              }}
+              style={{
+                padding: '0.4rem 0.7rem',
+                backgroundColor: '#1e88e5',
+                color: 'white',
+                border: 'none',
+                borderRadius: '5px',
+                cursor: 'pointer'
+              }}
+            >
+              🔊 Escuchar voz de Perón
+            </button>
+          )}
+        </div>
+      ))}
+
       <input
         type="text"
         value={input}
         onChange={e => setInput(e.target.value)}
         onKeyDown={e => e.key === 'Enter' && enviarMensaje()}
         placeholder="Escribile al General..."
-        style={{ width: '80%', padding: '0.5rem' }}
+        style={{ width: '80%', padding: '0.5rem', marginRight: '0.5rem' }}
       />
       <button onClick={enviarMensaje} style={{ padding: '0.5rem' }}>Enviar</button>
     </div>
