@@ -25,3 +25,8 @@ const PORT = 3000;
 app.listen(port, () => {
   console.log(`🎙️ Bot Perón activo en http://localhost:${port}`);
 });
+
+app.get('/', (req, res) => {
+  res.send('🎙️ Bot Perón está funcionando.');
+});
+
