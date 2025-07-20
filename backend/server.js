@@ -9,21 +9,21 @@ const peronRouter = require('./routes/peron');
 const app = express();
 const port = process.env.PORT || 3000;
 
-app.use(cors());
-app.use(express.json());
+app.use(cors({
+  origin: ['https://TU-NOMBRE.netlify.app', 'http://localhost:5173']
+}));
 
-// Servir frontend (Vite build)
-app.use(express.static(path.join(__dirname, 'frontend', 'dist')));
+app.use(express.json());
 
 // Servir audios generados
 app.use('/audios', express.static(path.join(__dirname, 'voz')));
 
-// API de Perón
+// API del Bot Perón
 app.use('/api/peron', peronRouter);
 
-// Ruta para frontend
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'frontend', 'dist', 'index.html'));
+// Ruta de prueba básica
+app.get('/', (req, res) => {
+  res.send('🎙️ Backend del Bot Perón activo.');
 });
 
 app.listen(port, () => {

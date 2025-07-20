@@ -1,5 +1,10 @@
 import { useState } from 'react';
 
+// Detecta automáticamente si estás en local o en producción
+const API_URL = window.location.hostname === 'localhost'
+  ? 'http://localhost:3000'
+  : 'https://bot-peron.onrender.com';
+
 const ChatBot = () => {
   const [input, setInput] = useState('');
   const [chat, setChat] = useState([
@@ -14,7 +19,7 @@ const ChatBot = () => {
     setInput('');
 
     try {
-      const res = await fetch('http://localhost:3000/api/peron', {
+      const res = await fetch(`${API_URL}/api/peron`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ texto: input })
@@ -30,7 +35,7 @@ const ChatBot = () => {
 
       // Reproducir voz después
       if (data.audio) {
-        const audio = new Audio(`http://localhost:3000${data.audio}`);
+        const audio = new Audio(`${API_URL}${data.audio}`);
         audio.play().catch(err => console.error('🎧 No se pudo reproducir el audio:', err));
       }
 
@@ -52,7 +57,7 @@ const ChatBot = () => {
           {msg.audio && (
             <button
               onClick={() => {
-                const audio = new Audio(`http://localhost:3000${msg.audio}`);
+                const audio = new Audio(`${API_URL}${msg.audio}`);
                 audio.play();
               }}
               style={{
