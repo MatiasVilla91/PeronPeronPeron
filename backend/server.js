@@ -1,6 +1,8 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 require('dotenv').config();
 
 const generarAudio = require('./voz/voz');
@@ -10,17 +12,18 @@ const mercadopagoWebhook = require('./routes/mercadopagoWebhook');
 
 const app = express();
 const port = process.env.PORT || 3000;
-const allowedOrigins = new Set([
-  'https://peronperon.netlify.app',
-  'http://localhost:5173'
-]);
+const allowedOrigins = new Set(
+  (process.env.ALLOWED_ORIGINS || 'https://peronperon.netlify.app,http://localhost:5173')
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean)
+);
 
 app.set('trust proxy', 1);
 
 const isAllowedOrigin = (origin) => {
   if (!origin) return true;
-  if (allowedOrigins.has(origin)) return true;
-  return origin.endsWith('.netlify.app') || origin.endsWith('.onrender.com');
+  return allowedOrigins.has(origin);
 };
 
 app.use(cors({
@@ -33,14 +36,33 @@ app.use(cors({
   }
 }));
 
-app.use(express.json());
+app.use(helmet({
+  crossOriginResourcePolicy: false
+}));
+
+app.use(express.json({ limit: '10kb' }));
+
+const apiLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 60,
+  standardHeaders: true,
+  legacyHeaders: false
+});
+
+const subscribeLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false
+});
 
 // Servir audios generados
 app.use('/audios', express.static(path.join(__dirname, 'voz')));
 
 // API del Bot Peron
+app.use('/api/', apiLimiter);
 app.use('/api/peron', peronRouter);
-app.use('/api/subscribe', subscribeRouter);
+app.use('/api/subscribe', subscribeLimiter, subscribeRouter);
 app.use('/webhooks/mercadopago', mercadopagoWebhook);
 
 // Ruta de prueba basica

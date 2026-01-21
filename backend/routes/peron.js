@@ -7,6 +7,7 @@ const router = express.Router();
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
 const dailyLimit = Number(process.env.FREE_DAILY_LIMIT || 3);
+const maxInputChars = Number(process.env.MAX_INPUT_CHARS || 800);
 const anonUsage = new Map();
 
 if (!supabaseUrl || !supabaseAnonKey) {
@@ -47,6 +48,9 @@ router.post('/', async (req, res) => {
 
   const { texto } = req.body;
   if (!texto) return res.status(400).json({ error: 'Texto requerido' });
+  if (texto.length > maxInputChars) {
+    return res.status(413).json({ error: 'Texto demasiado largo' });
+  }
 
   const today = new Date().toISOString().slice(0, 10);
   const clientIp = getClientIp(req);
