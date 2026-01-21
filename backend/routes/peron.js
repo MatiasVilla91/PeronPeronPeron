@@ -103,7 +103,7 @@ router.post('/', async (req, res) => {
   try {
     const respuestaTexto = await getPeronResponse(texto);
 
-    if (token && supabaseAuthed && user) {
+  if (token && supabaseAuthed && user) {
       await supabaseAuthed.from('usage_daily').upsert({
         user_id: user.id,
         date: today,
@@ -111,6 +111,11 @@ router.post('/', async (req, res) => {
       }, {
         onConflict: 'user_id,date'
       });
+
+      await supabaseAuthed.from('chat_history').insert([
+        { user_id: user.id, role: 'user', text: texto },
+        { user_id: user.id, role: 'peron', text: respuestaTexto }
+      ]);
     } else {
       const key = `${clientIp}:${today}`;
       anonUsage.set(key, currentCount + 1);

@@ -10,6 +10,8 @@ const peronRouter = require('./routes/peron');
 const subscribeRouter = require('./routes/subscribe');
 const mercadopagoWebhook = require('./routes/mercadopagoWebhook');
 const meRouter = require('./routes/me');
+const historyRouter = require('./routes/history');
+const subscriptionRouter = require('./routes/subscription');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -65,6 +67,8 @@ app.use('/api/', apiLimiter);
 app.use('/api/peron', peronRouter);
 app.use('/api/subscribe', subscribeLimiter, subscribeRouter);
 app.use('/api/me', meRouter);
+app.use('/api/history', historyRouter);
+app.use('/api/subscription', subscribeLimiter, subscriptionRouter);
 app.use('/webhooks/mercadopago', mercadopagoWebhook);
 
 // Ruta de prueba basica

@@ -11,6 +11,10 @@ function App() {
   const [subscribeStatus, setSubscribeStatus] = useState('');
   const [userInfo, setUserInfo] = useState(null);
   const [userLoading, setUserLoading] = useState(false);
+  const [historyItems, setHistoryItems] = useState([]);
+  const [historyLoading, setHistoryLoading] = useState(false);
+  const [subscriptionInfo, setSubscriptionInfo] = useState(null);
+  const [subscriptionStatus, setSubscriptionStatus] = useState('');
 
   useEffect(() => {
     setIsRecovery(window.location.hash.includes('type=recovery'));
@@ -31,6 +35,8 @@ function App() {
     const fetchUser = async () => {
       if (!session?.access_token) {
         setUserInfo(null);
+        setHistoryItems([]);
+        setSubscriptionInfo(null);
         return;
       }
       try {
@@ -51,6 +57,49 @@ function App() {
       }
     };
     fetchUser();
+  }, [session?.access_token]);
+
+  useEffect(() => {
+    const fetchHistory = async () => {
+      if (!session?.access_token) return;
+      try {
+        setHistoryLoading(true);
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/history?limit=20`, {
+          headers: {
+            Authorization: `Bearer ${session.access_token}`
+          }
+        });
+        const data = await res.json();
+        if (res.ok) {
+          setHistoryItems(data.items || []);
+        }
+      } catch (error) {
+        setHistoryItems([]);
+      } finally {
+        setHistoryLoading(false);
+      }
+    };
+    fetchHistory();
+  }, [session?.access_token]);
+
+  useEffect(() => {
+    const fetchSubscription = async () => {
+      if (!session?.access_token) return;
+      try {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/subscription`, {
+          headers: {
+            Authorization: `Bearer ${session.access_token}`
+          }
+        });
+        const data = await res.json();
+        if (res.ok) {
+          setSubscriptionInfo(data);
+        }
+      } catch (error) {
+        setSubscriptionInfo(null);
+      }
+    };
+    fetchSubscription();
   }, [session?.access_token]);
 
   const handleSignOut = async () => {
@@ -93,6 +142,30 @@ function App() {
       window.location.href = data.init_point;
     } catch (error) {
       setSubscribeStatus('No pudimos iniciar la suscripciÃ³n. ProbÃ¡ de nuevo.');
+    }
+  };
+
+  const handleSubscriptionAction = async (action) => {
+    if (!session?.access_token) return;
+    setSubscriptionStatus('Procesando...');
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/subscription`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${session.access_token}`
+        },
+        body: JSON.stringify({ action })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setSubscriptionStatus('No pudimos actualizar la suscripción.');
+        return;
+      }
+      setSubscriptionStatus(`Estado actualizado: ${data.status}`);
+      setSubscriptionInfo((prev) => prev ? { ...prev, status: data.status, hasSubscription: true } : prev);
+    } catch (error) {
+      setSubscriptionStatus('No pudimos actualizar la suscripción.');
     }
   };
 
@@ -352,6 +425,45 @@ function App() {
                       ) : (
                         <p className="user-panel-status">No pudimos cargar tus datos.</p>
                       )}
+                      <div className="user-panel-actions">
+                        {subscriptionInfo?.hasSubscription ? (
+                          <>
+                            <button className="ghost small" type="button" onClick={() => handleSubscriptionAction('pause')}>
+                              Pausar
+                            </button>
+                            <button className="ghost small" type="button" onClick={() => handleSubscriptionAction('resume')}>
+                              Reanudar
+                            </button>
+                            <button className="ghost small danger" type="button" onClick={() => handleSubscriptionAction('cancel')}>
+                              Cancelar
+                            </button>
+                          </>
+                        ) : (
+                          <button className="ghost small" type="button" onClick={handleSubscribe}>
+                            Gestionar suscripción
+                          </button>
+                        )}
+                        {subscriptionStatus && (
+                          <p className="user-panel-status">{subscriptionStatus}</p>
+                        )}
+                      </div>
+                      <div className="user-panel-history">
+                        <p className="user-panel-label">Historial reciente</p>
+                        {historyLoading ? (
+                          <p className="user-panel-status">Cargando historial...</p>
+                        ) : historyItems.length ? (
+                          <ul className="history-list">
+                            {historyItems.map((item) => (
+                              <li key={item.id}>
+                                <span className="history-role">{item.role === 'peron' ? 'Perón' : 'Vos'}</span>
+                                <span className="history-text">{item.text}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        ) : (
+                          <p className="user-panel-status">Todavía no hay mensajes guardados.</p>
+                        )}
+                      </div>
                     </div>
                   )}
                   {!session && (

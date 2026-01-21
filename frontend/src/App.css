@@ -718,6 +718,54 @@
   font-weight: 600;
 }
 
+.user-panel-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  align-items: center;
+}
+
+.ghost.danger {
+  border-color: rgba(200, 60, 60, 0.3);
+  color: #a02020;
+}
+
+.user-panel-history {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.history-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 0.6rem;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.history-list li {
+  display: grid;
+  gap: 0.2rem;
+  padding: 0.6rem 0.8rem;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.75);
+}
+
+.history-role {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 700;
+  color: var(--ink-500);
+}
+
+.history-text {
+  color: var(--ink-800);
+  font-size: 0.95rem;
+}
+
 .auth-header h3 {
   margin: 0 0 0.4rem;
   font-weight: 700;
