@@ -21,12 +21,15 @@ const ChatBot = ({ accessToken }) => {
 
     try {
       setIsTyping(true);
+      const headers = {
+        'Content-Type': 'application/json'
+      };
+      if (accessToken) {
+        headers.Authorization = `Bearer ${accessToken}`;
+      }
       const res = await fetch(`${API_URL}/api/peron`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${accessToken}`
-        },
+        headers,
         body: JSON.stringify({ texto: input })
       });
 
@@ -34,7 +37,7 @@ const ChatBot = ({ accessToken }) => {
         setIsTyping(false);
         setChat([
           ...nuevoChat,
-          { role: 'peron', text: 'Necesitás iniciar sesión para continuar.' }
+          { role: 'peron', text: 'Si querés más beneficios, iniciá sesión.' }
         ]);
         return;
       }

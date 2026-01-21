@@ -249,10 +249,16 @@ function App() {
                 </div>
               ) : isRecovery ? (
                 <ResetPasswordPanel />
-              ) : session ? (
-                <ChatBot accessToken={session.access_token} />
               ) : (
-                <AuthPanel onAuth={setSession} />
+                <>
+                  <ChatBot accessToken={session?.access_token} />
+                  {!session && (
+                    <div className="auth-cta">
+                      <p>Si te gustó, creá tu cuenta y accedé al plan Pro.</p>
+                      <AuthPanel onAuth={setSession} />
+                    </div>
+                  )}
+                </>
               )}
             </div>
           </div>

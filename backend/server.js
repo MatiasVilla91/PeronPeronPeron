@@ -13,6 +13,8 @@ const allowedOrigins = new Set([
   'http://localhost:5173'
 ]);
 
+app.set('trust proxy', 1);
+
 const isAllowedOrigin = (origin) => {
   if (!origin) return true;
   if (allowedOrigins.has(origin)) return true;
