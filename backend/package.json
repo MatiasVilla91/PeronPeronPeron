@@ -10,6 +10,7 @@
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
+    "@supabase/supabase-js": "^2.49.1",
     "uuid": "^9.0.0"
   }
 }

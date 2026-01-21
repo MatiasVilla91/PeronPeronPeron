@@ -5,7 +5,7 @@ const defaultApiUrl = window.location.hostname === 'localhost'
   : 'https://peronperonperon-1.onrender.com';
 const API_URL = import.meta.env.VITE_API_URL || defaultApiUrl;
 
-const ChatBot = () => {
+const ChatBot = ({ accessToken }) => {
   const [input, setInput] = useState('');
   const [chat, setChat] = useState([
     { role: 'peron', text: '¡Hola compañero! ¿En qué puedo ayudarte hoy?' }
@@ -23,9 +23,30 @@ const ChatBot = () => {
       setIsTyping(true);
       const res = await fetch(`${API_URL}/api/peron`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`
+        },
         body: JSON.stringify({ texto: input })
       });
+
+      if (res.status === 401) {
+        setIsTyping(false);
+        setChat([
+          ...nuevoChat,
+          { role: 'peron', text: 'Necesitás iniciar sesión para continuar.' }
+        ]);
+        return;
+      }
+
+      if (res.status === 429) {
+        setIsTyping(false);
+        setChat([
+          ...nuevoChat,
+          { role: 'peron', text: 'Llegaste al límite diario. Pasá al plan Pro para seguir.' }
+        ]);
+        return;
+      }
 
       const data = await res.json();
 

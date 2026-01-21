@@ -1,7 +1,32 @@
+import { useEffect, useState } from 'react';
 import ChatBot from './components/ChatBot';
+import AuthPanel from './components/AuthPanel';
+import ResetPasswordPanel from './components/ResetPasswordPanel';
+import { supabase } from './lib/supabaseClient';
 import './App.css';
 
 function App() {
+  const [session, setSession] = useState(null);
+  const [isRecovery, setIsRecovery] = useState(false);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      setSession(data.session);
+    });
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+      setSession(nextSession);
+    });
+    setIsRecovery(window.location.hash.includes('type=recovery'));
+    return () => {
+      listener?.subscription?.unsubscribe();
+    };
+  }, []);
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    setSession(null);
+  };
+
   return (
     <div className="app">
       <header className="site-header">
@@ -19,7 +44,13 @@ function App() {
             <a href="#impacto">Impacto</a>
             <a href="#chat">Chat</a>
           </nav>
-          <a className="cta small" href="#chat">Sumarse</a>
+          <div className="header-actions">
+            {session ? (
+              <button className="ghost small" onClick={handleSignOut}>Salir</button>
+            ) : (
+              <a className="cta small" href="#chat">Sumarse</a>
+            )}
+          </div>
         </div>
       </header>
 
@@ -193,9 +224,25 @@ function App() {
                 <span>Respuesta inmediata</span>
                 <strong>Conversión garantizada con mensajes claros</strong>
               </div>
+              <div className="plan-card">
+                <p className="plan-title">Plan Gratis</p>
+                <p className="plan-price">$0</p>
+                <p className="plan-detail">3 preguntas por día · Acceso inmediato</p>
+              </div>
+              <div className="plan-card pro">
+                <p className="plan-title">Plan Pro</p>
+                <p className="plan-price">$7.500 ARS / mes</p>
+                <p className="plan-detail">Ilimitado · Historial completo · Prioridad</p>
+              </div>
             </div>
             <div className="chat-shell">
-              <ChatBot />
+              {isRecovery ? (
+                <ResetPasswordPanel />
+              ) : session ? (
+                <ChatBot accessToken={session.access_token} />
+              ) : (
+                <AuthPanel onAuth={setSession} />
+              )}
             </div>
           </div>
         </section>

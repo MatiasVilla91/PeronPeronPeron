@@ -118,6 +118,17 @@
   background: rgba(255, 255, 255, 0.6);
 }
 
+.ghost.small {
+  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
 .hero {
   padding: 4.5rem 0 5rem;
 }
@@ -417,6 +428,42 @@
   font-weight: 600;
 }
 
+.plan-card {
+  margin-top: 1.2rem;
+  padding: 1.2rem 1.4rem;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(3, 46, 99, 0.08);
+  box-shadow: 0 12px 26px rgba(16, 88, 156, 0.08);
+}
+
+.plan-card.pro {
+  background: linear-gradient(135deg, rgba(12, 90, 166, 0.12), rgba(255, 227, 168, 0.35));
+  border-color: rgba(12, 90, 166, 0.2);
+}
+
+.plan-title {
+  margin: 0;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.8rem;
+  color: var(--sky-800);
+}
+
+.plan-price {
+  margin: 0.4rem 0;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--ink-900);
+}
+
+.plan-detail {
+  margin: 0;
+  color: var(--ink-600);
+  font-size: 0.95rem;
+}
+
 .chat-shell {
   background: white;
   border-radius: 24px;
@@ -568,6 +615,75 @@
   cursor: pointer;
 }
 
+.auth-panel {
+  display: grid;
+  gap: 1.2rem;
+  padding: 1.4rem;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(3, 46, 99, 0.08);
+}
+
+.auth-header h3 {
+  margin: 0 0 0.4rem;
+  font-weight: 700;
+}
+
+.auth-header p {
+  margin: 0;
+  color: var(--ink-600);
+}
+
+.auth-form {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.auth-form label {
+  display: grid;
+  gap: 0.4rem;
+  font-size: 0.9rem;
+  color: var(--ink-700);
+}
+
+.auth-form input {
+  border-radius: 12px;
+  border: 1px solid rgba(3, 46, 99, 0.2);
+  padding: 0.7rem 0.9rem;
+  font-size: 0.95rem;
+}
+
+.auth-form button {
+  border: none;
+  border-radius: 999px;
+  padding: 0.75rem 1.4rem;
+  background: linear-gradient(135deg, #0c5aa6, #1a84d9);
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.auth-status {
+  margin: 0;
+  color: var(--sky-800);
+  font-weight: 600;
+}
+
+.auth-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.auth-actions button {
+  border: none;
+  background: transparent;
+  color: var(--sky-700);
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+}
+
 @media (max-width: 900px) {
   .nav {
     display: none;
@@ -588,6 +704,11 @@
 
   .cta.small {
     width: 100%;
+  }
+
+  .header-actions {
+    width: 100%;
+    justify-content: center;
   }
 
   .hero-grid,
