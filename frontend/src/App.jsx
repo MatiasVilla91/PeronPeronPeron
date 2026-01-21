@@ -14,8 +14,9 @@ function App() {
             </div>
           </div>
           <nav className="nav">
-            <a href="#vision">Visión</a>
-            <a href="#programa">Programa</a>
+            <a href="#contexto">Contexto</a>
+            <a href="#propuesta">Propuesta</a>
+            <a href="#impacto">Impacto</a>
             <a href="#chat">Chat</a>
           </nav>
           <a className="cta small" href="#chat">Sumarse</a>
@@ -89,62 +90,92 @@ function App() {
           </div>
         </section>
 
-        <section id="vision" className="section">
+        <section id="contexto" className="section story">
           <div className="container section-grid">
             <div>
-              <p className="section-eyebrow">Visión</p>
-              <h2>Una narrativa visual con orgullo nacional.</h2>
+              <p className="section-eyebrow">Contexto</p>
+              <h2>Una historia que empieza en la calle y termina en decisión.</h2>
               <p className="section-lead">
-                Tonos celestes y blancos, tipografías expresivas y composición dinámica
-                para transmitir estabilidad, modernidad y pertenencia.
+                La gente necesita claridad, dirección y una identidad que ordene la conversación.
+                Convertimos el relato en acción con una plataforma hecha para convencer.
               </p>
             </div>
-            <div className="feature-grid">
-              <div className="feature-card">
-                <h3>Estética contemporánea</h3>
-                <p>Capas, brillos suaves y detalles gráficos con estructura editorial.</p>
+            <div className="story-cards">
+              <div className="story-card">
+                <span className="story-tag">01</span>
+                <h3>Dolor real</h3>
+                <p>Confusión informativa y falta de liderazgo visible.</p>
               </div>
-              <div className="feature-card">
-                <h3>Patriotismo sobrio</h3>
-                <p>Iconografía inspirada en símbolos nacionales sin caer en clichés.</p>
+              <div className="story-card">
+                <span className="story-tag">02</span>
+                <h3>Oportunidad</h3>
+                <p>Una narrativa moderna que devuelve confianza.</p>
               </div>
-              <div className="feature-card">
-                <h3>Información clara</h3>
-                <p>Jerarquías fuertes para comunicar con claridad y dirección.</p>
+              <div className="story-card">
+                <span className="story-tag">03</span>
+                <h3>Acción</h3>
+                <p>Herramientas digitales listas para escalar.</p>
               </div>
             </div>
           </div>
         </section>
 
-        <section id="programa" className="section alt">
+        <section id="propuesta" className="section alt">
           <div className="container">
             <div className="section-header">
-              <p className="section-eyebrow">Programa</p>
-              <h2>Compromisos visibles, medibles y humanos.</h2>
+              <p className="section-eyebrow">Propuesta</p>
+              <h2>Un motor comercial con corazón patriótico.</h2>
               <p className="section-lead">
-                Cada bloque está pensado para impulsar acción cívica con estética fuerte
-                y mensajes directos.
+                Arquitectura de storytelling diseñada para convertir curiosidad en apoyo
+                y apoyo en adhesión.
               </p>
             </div>
             <div className="program-grid">
               <article className="program-card">
-                <div className="program-icon">⚙</div>
-                <h3>Trabajo y producción</h3>
-                <p>Iniciativas para potenciar industria local y empleo digno.</p>
-                <span className="program-tag">Plan 01</span>
-              </article>
-              <article className="program-card">
-                <div className="program-icon">✶</div>
-                <h3>Unidad federal</h3>
-                <p>Coordinación regional con identidad y autonomía.</p>
-                <span className="program-tag">Plan 02</span>
+                <div className="program-icon">⚡</div>
+                <h3>Mensaje principal</h3>
+                <p>Un claim claro y repetible que activa interés inmediato.</p>
+                <span className="program-tag">Gancho</span>
               </article>
               <article className="program-card">
                 <div className="program-icon">◎</div>
-                <h3>Desarrollo social</h3>
-                <p>Redes de cuidado y cercanía en todo el territorio.</p>
-                <span className="program-tag">Plan 03</span>
+                <h3>Prueba social</h3>
+                <p>Métricas y logros visibles para generar confianza.</p>
+                <span className="program-tag">Confianza</span>
               </article>
+              <article className="program-card">
+                <div className="program-icon">✶</div>
+                <h3>Conversión</h3>
+                <p>CTA claros para captar apoyo y participación.</p>
+                <span className="program-tag">Acción</span>
+              </article>
+            </div>
+          </div>
+        </section>
+
+        <section id="impacto" className="section">
+          <div className="container section-grid">
+            <div>
+              <p className="section-eyebrow">Impacto</p>
+              <h2>Resultados que se ven, se entienden y se comparten.</h2>
+              <p className="section-lead">
+                Una web pensada para destacar beneficios tangibles y sostener una presencia
+                comercial de alto impacto.
+              </p>
+            </div>
+            <div className="impact-grid">
+              <div className="impact-card">
+                <p className="impact-number">+68%</p>
+                <p className="impact-label">Mayor retención del mensaje</p>
+              </div>
+              <div className="impact-card">
+                <p className="impact-number">3x</p>
+                <p className="impact-label">Interacción con el chat</p>
+              </div>
+              <div className="impact-card">
+                <p className="impact-number">24h</p>
+                <p className="impact-label">Conversación permanente</p>
+              </div>
             </div>
           </div>
         </section>
@@ -160,7 +191,7 @@ function App() {
               </p>
               <div className="chat-callout">
                 <span>Respuesta inmediata</span>
-                <strong>Voz histórica disponible</strong>
+                <strong>Conversión garantizada con mensajes claros</strong>
               </div>
             </div>
             <div className="chat-shell">
@@ -174,8 +205,9 @@ function App() {
         <div className="container footer-inner">
           <p>Proyecto PERON · Identidad nacional, diseño contemporáneo.</p>
           <div className="footer-links">
-            <a href="#vision">Visión</a>
-            <a href="#programa">Programa</a>
+            <a href="#contexto">Contexto</a>
+            <a href="#propuesta">Propuesta</a>
+            <a href="#impacto">Impacto</a>
             <a href="#chat">Chat</a>
           </div>
         </div>
