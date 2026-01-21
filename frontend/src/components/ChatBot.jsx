@@ -29,13 +29,8 @@ const ChatBot = () => {
 
       setChat([
         ...nuevoChat,
-        { role: 'peron', text: data.texto, audio: data.audio || null }
+        { role: 'peron', text: data.texto }
       ]);
-
-      if (data.audio) {
-        const audio = new Audio(`${API_URL}${data.audio}`);
-        audio.play().catch(err => console.error('No se pudo reproducir el audio:', err));
-      }
     } catch (err) {
       setChat([
         ...nuevoChat,
@@ -60,17 +55,6 @@ const ChatBot = () => {
             <div className="chat-bubble">
               <p className="chat-author">{msg.role === 'peron' ? 'Perón' : 'Vos'}</p>
               <p className="chat-text">{msg.text}</p>
-              {msg.audio && (
-                <button
-                  className="audio-button"
-                  onClick={() => {
-                    const audio = new Audio(`${API_URL}${msg.audio}`);
-                    audio.play();
-                  }}
-                >
-                  Escuchar voz
-                </button>
-              )}
             </div>
           </div>
         ))}
