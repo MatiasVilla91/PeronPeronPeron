@@ -40,6 +40,7 @@ router.post('/', async (req, res) => {
   if (!user) return res.status(401).json({ error: 'Unauthorized' });
 
   if (!mpAccessToken) {
+    console.error('Missing MP access token');
     return res.status(500).json({ error: 'Missing MP access token' });
   }
 
@@ -79,8 +80,12 @@ router.post('/', async (req, res) => {
       status: data.status
     });
   } catch (error) {
-    console.error('Error creando suscripcion:', error.response?.data || error.message);
-    res.status(500).json({ error: 'No se pudo crear la suscripcion' });
+    const mpError = error.response?.data || null;
+    console.error('Error creando suscripcion:', mpError || error.message);
+    res.status(500).json({
+      error: 'No se pudo crear la suscripcion',
+      details: mpError?.message || mpError?.error || error.message
+    });
   }
 });
 
