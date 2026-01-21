@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 const defaultApiUrl = window.location.hostname === 'localhost'
   ? 'http://localhost:3000'
-  : 'https://peron.onrender.com';
+  : 'https://peronperonperon-1.onrender.com';
 const API_URL = import.meta.env.VITE_API_URL || defaultApiUrl;
 
 const ChatBot = () => {
