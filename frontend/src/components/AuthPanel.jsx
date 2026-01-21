@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { supabase } from '../lib/supabaseClient';
+import { supabase, supabaseReady } from '../lib/supabaseClient';
 
 const AuthPanel = ({ onAuth }) => {
   const [mode, setMode] = useState('login');
@@ -12,6 +12,11 @@ const AuthPanel = ({ onAuth }) => {
     e.preventDefault();
     setLoading(true);
     setStatus('');
+    if (!supabaseReady) {
+      setLoading(false);
+      setStatus('Faltan variables de Supabase en Netlify.');
+      return;
+    }
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password
@@ -28,6 +33,11 @@ const AuthPanel = ({ onAuth }) => {
     e.preventDefault();
     setLoading(true);
     setStatus('');
+    if (!supabaseReady) {
+      setLoading(false);
+      setStatus('Faltan variables de Supabase en Netlify.');
+      return;
+    }
     const { data, error } = await supabase.auth.signUp({
       email,
       password
@@ -48,6 +58,11 @@ const AuthPanel = ({ onAuth }) => {
     e.preventDefault();
     setLoading(true);
     setStatus('');
+    if (!supabaseReady) {
+      setLoading(false);
+      setStatus('Faltan variables de Supabase en Netlify.');
+      return;
+    }
     const { error } = await supabase.auth.resetPasswordForEmail(email);
     setLoading(false);
     if (error) {

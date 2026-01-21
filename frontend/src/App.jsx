@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import ChatBot from './components/ChatBot';
 import AuthPanel from './components/AuthPanel';
 import ResetPasswordPanel from './components/ResetPasswordPanel';
-import { supabase } from './lib/supabaseClient';
+import { supabase, supabaseReady } from './lib/supabaseClient';
 import './App.css';
 
 function App() {
@@ -10,21 +10,25 @@ function App() {
   const [isRecovery, setIsRecovery] = useState(false);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session);
-    });
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, nextSession) => {
-      setSession(nextSession);
-    });
+    if (supabaseReady) {
+      supabase.auth.getSession().then(({ data }) => {
+        setSession(data.session);
+      });
+      const { data: listener } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+        setSession(nextSession);
+      });
+      return () => {
+        listener?.subscription?.unsubscribe();
+      };
+    }
     setIsRecovery(window.location.hash.includes('type=recovery'));
-    return () => {
-      listener?.subscription?.unsubscribe();
-    };
   }, []);
 
   const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    setSession(null);
+    if (supabaseReady) {
+      await supabase.auth.signOut();
+      setSession(null);
+    }
   };
 
   return (
@@ -236,7 +240,14 @@ function App() {
               </div>
             </div>
             <div className="chat-shell">
-              {isRecovery ? (
+              {!supabaseReady ? (
+                <div className="auth-panel">
+                  <div className="auth-header">
+                    <h3>Configuración pendiente</h3>
+                    <p>Faltan variables de entorno de Supabase en Netlify.</p>
+                  </div>
+                </div>
+              ) : isRecovery ? (
                 <ResetPasswordPanel />
               ) : session ? (
                 <ChatBot accessToken={session.access_token} />

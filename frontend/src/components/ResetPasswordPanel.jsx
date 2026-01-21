@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { supabase } from '../lib/supabaseClient';
+import { supabase, supabaseReady } from '../lib/supabaseClient';
 
 const ResetPasswordPanel = () => {
   const [password, setPassword] = useState('');
@@ -10,6 +10,11 @@ const ResetPasswordPanel = () => {
     e.preventDefault();
     setLoading(true);
     setStatus('');
+    if (!supabaseReady) {
+      setLoading(false);
+      setStatus('Faltan variables de Supabase en Netlify.');
+      return;
+    }
     const { error } = await supabase.auth.updateUser({ password });
     setLoading(false);
     if (error) {
