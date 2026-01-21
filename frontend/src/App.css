@@ -576,11 +576,13 @@
   .hero {
     padding-top: 3.5rem;
   }
-}
 
-@media (max-width: 600px) {
   .header-inner {
     flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .brand {
     justify-content: center;
   }
 
@@ -588,13 +590,70 @@
     width: 100%;
   }
 
+  .hero-grid,
+  .section-grid,
+  .chat-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .program-grid,
+  .stats,
+  .impact-grid {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  }
+
+  .panel-card,
+  .chat-shell {
+    box-shadow: 0 16px 32px rgba(16, 88, 156, 0.14);
+  }
+}
+
+@media (max-width: 600px) {
   .hero-actions,
   .footer-inner {
     flex-direction: column;
     align-items: stretch;
   }
 
+  .hero h1 {
+    font-size: clamp(2.1rem, 9vw, 2.6rem);
+  }
+
+  .eyebrow {
+    font-size: 0.8rem;
+  }
+
+  .lead,
+  .section-lead {
+    font-size: 1rem;
+  }
+
+  .sun-badge {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.4rem;
+  }
+
+  .panel-card {
+    padding: 1.3rem;
+  }
+
+  .program-card,
+  .feature-card,
+  .story-card,
+  .impact-card {
+    padding: 1.2rem;
+  }
+
+  .stat-card {
+    padding: 0.9rem 1rem;
+  }
+
   .chatbot-input {
     grid-template-columns: 1fr;
+  }
+
+  .chatbot-body {
+    max-height: 320px;
   }
 }
