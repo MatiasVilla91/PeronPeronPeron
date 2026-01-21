@@ -52,7 +52,7 @@ function App() {
       });
       const data = await res.json();
       if (!res.ok || !data.init_point) {
-        setSubscribeStatus('No pudimos iniciar la suscripciÃ³n. ProbÃ¡ de nuevo.');
+        setSubscribeStatus(`No pudimos iniciar la suscripciÃ³n. ${data?.details || 'ProbÃ¡ de nuevo.'}`);
         return;
       }
       window.location.href = data.init_point;
