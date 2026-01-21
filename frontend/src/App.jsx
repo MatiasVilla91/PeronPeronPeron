@@ -63,27 +63,27 @@ function App() {
           <div className="container hero-grid">
             <div className="hero-copy">
               <p className="eyebrow">Soberanía · Justicia social · Independencia económica</p>
-              <h1>Una interfaz contemporánea con identidad nacional.</h1>
+              <h1>Hablemos claro, entre nosotros.</h1>
               <p className="lead">
-                Diseño sólido, claro y patriótico para comunicar propuestas con autoridad,
-                cercanía y una estética inconfundible.
+                Esta plataforma está pensada para vos: directa, cercana y con identidad.
+                Queremos que la conversación sea simple, útil y bien nuestra.
               </p>
               <div className="hero-actions">
-                <a className="cta" href="#chat">Iniciar conversación</a>
-                <a className="ghost" href="#programa">Conocer el plan</a>
+                <a className="cta" href="#chat">Quiero conversar</a>
+                <a className="ghost" href="#propuesta">Ver la propuesta</a>
               </div>
               <div className="stats">
                 <div className="stat-card">
                   <span className="stat-number">24/7</span>
-                  <span className="stat-label">Asistencia ciudadana</span>
+                  <span className="stat-label">Acompañamiento siempre</span>
                 </div>
                 <div className="stat-card">
                   <span className="stat-number">+120</span>
-                  <span className="stat-label">Propuestas priorizadas</span>
+                  <span className="stat-label">Ideas en marcha</span>
                 </div>
                 <div className="stat-card">
                   <span className="stat-number">100%</span>
-                  <span className="stat-label">Diseño soberano</span>
+                  <span className="stat-label">Identidad popular</span>
                 </div>
               </div>
             </div>
@@ -93,32 +93,32 @@ function App() {
                 <strong>1945</strong>
               </div>
               <div className="panel-card">
-                <p className="panel-title">Agenda estratégica</p>
+                <p className="panel-title">Agenda de todos</p>
                 <div className="panel-row">
                   <span className="panel-dot" />
                   <div>
-                    <p className="panel-heading">Industria & trabajo</p>
-                    <p className="panel-text">Ejes productivos con foco federal.</p>
+                    <p className="panel-heading">Trabajo e industria</p>
+                    <p className="panel-text">Que el esfuerzo rinda y se vea en cada barrio.</p>
                   </div>
                 </div>
                 <div className="panel-row">
                   <span className="panel-dot" />
                   <div>
-                    <p className="panel-heading">Innovación pública</p>
-                    <p className="panel-text">Tecnología al servicio del pueblo.</p>
+                    <p className="panel-heading">Estado presente</p>
+                    <p className="panel-text">Trámites claros, respuestas rápidas, solución real.</p>
                   </div>
                 </div>
                 <div className="panel-row">
                   <span className="panel-dot" />
                   <div>
-                    <p className="panel-heading">Unidad nacional</p>
-                    <p className="panel-text">Diálogo y cohesión social.</p>
+                    <p className="panel-heading">Unidad y futuro</p>
+                    <p className="panel-text">Más unión, menos pelea, más destino común.</p>
                   </div>
                 </div>
               </div>
               <div className="panel-footer">
                 <span className="pill">Identidad</span>
-                <span className="pill">Transparencia</span>
+                <span className="pill">Cercanía</span>
                 <span className="pill">Futuro</span>
               </div>
             </div>
@@ -129,27 +129,27 @@ function App() {
           <div className="container section-grid">
             <div>
               <p className="section-eyebrow">Contexto</p>
-              <h2>Una historia que empieza en la calle y termina en decisión.</h2>
+              <h2>La historia arranca en la calle.</h2>
               <p className="section-lead">
-                La gente necesita claridad, dirección y una identidad que ordene la conversación.
-                Convertimos el relato en acción con una plataforma hecha para convencer.
+                Todos queremos lo mismo: que nos escuchen y que las cosas mejoren.
+                Acá la conversación es simple y directa, sin vueltas.
               </p>
             </div>
             <div className="story-cards">
               <div className="story-card">
                 <span className="story-tag">01</span>
-                <h3>Dolor real</h3>
-                <p>Confusión informativa y falta de liderazgo visible.</p>
+                <h3>Lo que duele</h3>
+                <p>Demasiado ruido, poca claridad y promesas que no llegan.</p>
               </div>
               <div className="story-card">
                 <span className="story-tag">02</span>
-                <h3>Oportunidad</h3>
-                <p>Una narrativa moderna que devuelve confianza.</p>
+                <h3>Lo que queremos</h3>
+                <p>Información clara, respuestas rápidas y un rumbo firme.</p>
               </div>
               <div className="story-card">
                 <span className="story-tag">03</span>
-                <h3>Acción</h3>
-                <p>Herramientas digitales listas para escalar.</p>
+                <h3>Lo que hacemos</h3>
+                <p>Una herramienta simple para conversar y decidir mejor.</p>
               </div>
             </div>
           </div>
@@ -159,29 +159,29 @@ function App() {
           <div className="container">
             <div className="section-header">
               <p className="section-eyebrow">Propuesta</p>
-              <h2>Un motor comercial con corazón patriótico.</h2>
+              <h2>Una propuesta clara, con identidad y rumbo.</h2>
               <p className="section-lead">
-                Arquitectura de storytelling diseñada para convertir curiosidad en apoyo
-                y apoyo en adhesión.
+                Explicamos lo importante de forma simple para que cualquiera lo entienda,
+                lo comparta y lo haga propio.
               </p>
             </div>
             <div className="program-grid">
               <article className="program-card">
                 <div className="program-icon">⚡</div>
-                <h3>Mensaje principal</h3>
-                <p>Un claim claro y repetible que activa interés inmediato.</p>
-                <span className="program-tag">Gancho</span>
+                <h3>Mensaje directo</h3>
+                <p>Una idea central que se entiende en dos líneas.</p>
+                <span className="program-tag">Claro</span>
               </article>
               <article className="program-card">
                 <div className="program-icon">◎</div>
-                <h3>Prueba social</h3>
-                <p>Métricas y logros visibles para generar confianza.</p>
+                <h3>Confianza real</h3>
+                <p>Hechos y datos que hablan por sí solos.</p>
                 <span className="program-tag">Confianza</span>
               </article>
               <article className="program-card">
                 <div className="program-icon">✶</div>
-                <h3>Conversión</h3>
-                <p>CTA claros para captar apoyo y participación.</p>
+                <h3>Participación</h3>
+                <p>Sumarse es simple, rápido y sin trabas.</p>
                 <span className="program-tag">Acción</span>
               </article>
             </div>
@@ -192,24 +192,24 @@ function App() {
           <div className="container section-grid">
             <div>
               <p className="section-eyebrow">Impacto</p>
-              <h2>Resultados que se ven, se entienden y se comparten.</h2>
+              <h2>Resultados que se notan.</h2>
               <p className="section-lead">
-                Una web pensada para destacar beneficios tangibles y sostener una presencia
-                comercial de alto impacto.
+                No es solo diseño: es una forma de contar mejor lo que hacemos
+                y de sumar a más gente todos los días.
               </p>
             </div>
             <div className="impact-grid">
               <div className="impact-card">
                 <p className="impact-number">+68%</p>
-                <p className="impact-label">Mayor retención del mensaje</p>
+                <p className="impact-label">Más gente entiende el mensaje</p>
               </div>
               <div className="impact-card">
                 <p className="impact-number">3x</p>
-                <p className="impact-label">Interacción con el chat</p>
+                <p className="impact-label">Más conversación real</p>
               </div>
               <div className="impact-card">
                 <p className="impact-number">24h</p>
-                <p className="impact-label">Conversación permanente</p>
+                <p className="impact-label">Respuesta siempre disponible</p>
               </div>
             </div>
           </div>
@@ -219,24 +219,24 @@ function App() {
           <div className="container chat-grid">
             <div className="chat-intro">
               <p className="section-eyebrow">Chat ciudadano</p>
-              <h2>Conversá con el General en tiempo real.</h2>
+              <h2>Hablemos como corresponde, sin vueltas.</h2>
               <p className="section-lead">
-                Un asistente entrenado para responder consultas, compartir ideas y
-                mantener viva la conversación con la historia.
+                Este espacio es para preguntar, opinar y entender mejor.
+                Estamos para escucharte y responderte.
               </p>
               <div className="chat-callout">
                 <span>Respuesta inmediata</span>
-                <strong>Conversión garantizada con mensajes claros</strong>
+                <strong>Un canal directo con voz cercana</strong>
               </div>
               <div className="plan-card">
                 <p className="plan-title">Plan Gratis</p>
                 <p className="plan-price">$0</p>
-                <p className="plan-detail">3 preguntas por día · Acceso inmediato</p>
+                <p className="plan-detail">3 preguntas por día · Sin vueltas</p>
               </div>
               <div className="plan-card pro">
                 <p className="plan-title">Plan Pro</p>
                 <p className="plan-price">$7.500 ARS / mes</p>
-                <p className="plan-detail">Ilimitado · Historial completo · Prioridad</p>
+                <p className="plan-detail">Ilimitado · Historial · Prioridad</p>
               </div>
             </div>
             <div className="chat-shell">
@@ -261,7 +261,7 @@ function App() {
 
       <footer className="site-footer">
         <div className="container footer-inner">
-          <p>Proyecto PERON · Identidad nacional, diseño contemporáneo.</p>
+          <p>Proyecto PERON · Hecho con identidad y cercanía.</p>
           <div className="footer-links">
             <a href="#contexto">Contexto</a>
             <a href="#propuesta">Propuesta</a>
