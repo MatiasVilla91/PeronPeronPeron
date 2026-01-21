@@ -10,6 +10,7 @@ const ChatBot = () => {
   const [chat, setChat] = useState([
     { role: 'peron', text: '¡Hola compañero! ¿En qué puedo ayudarte hoy?' }
   ]);
+  const [isTyping, setIsTyping] = useState(false);
 
   const enviarMensaje = async () => {
     if (!input.trim()) return;
@@ -19,6 +20,7 @@ const ChatBot = () => {
     setInput('');
 
     try {
+      setIsTyping(true);
       const res = await fetch(`${API_URL}/api/peron`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -31,7 +33,9 @@ const ChatBot = () => {
         ...nuevoChat,
         { role: 'peron', text: data.texto }
       ]);
+      setIsTyping(false);
     } catch (err) {
+      setIsTyping(false);
       setChat([
         ...nuevoChat,
         { role: 'peron', text: 'Error al contactar al General.' }
@@ -58,6 +62,14 @@ const ChatBot = () => {
             </div>
           </div>
         ))}
+        {isTyping && (
+          <div className="chat-message peron">
+            <div className="chat-bubble">
+              <p className="chat-author">Perón</p>
+              <p className="chat-text">Escribiendo…</p>
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="chatbot-input">
