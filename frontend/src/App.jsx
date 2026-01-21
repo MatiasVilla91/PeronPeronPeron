@@ -9,6 +9,8 @@ function App() {
   const [session, setSession] = useState(null);
   const [isRecovery, setIsRecovery] = useState(false);
   const [subscribeStatus, setSubscribeStatus] = useState('');
+  const [userInfo, setUserInfo] = useState(null);
+  const [userLoading, setUserLoading] = useState(false);
 
   useEffect(() => {
     setIsRecovery(window.location.hash.includes('type=recovery'));
@@ -24,6 +26,32 @@ function App() {
       };
     }
   }, []);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      if (!session?.access_token) {
+        setUserInfo(null);
+        return;
+      }
+      try {
+        setUserLoading(true);
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/me`, {
+          headers: {
+            Authorization: `Bearer ${session.access_token}`
+          }
+        });
+        const data = await res.json();
+        if (res.ok) {
+          setUserInfo(data);
+        }
+      } catch (error) {
+        setUserInfo(null);
+      } finally {
+        setUserLoading(false);
+      }
+    };
+    fetchUser();
+  }, [session?.access_token]);
 
   const handleSignOut = async () => {
     if (supabaseReady) {
@@ -293,6 +321,39 @@ function App() {
               ) : (
                 <>
                   <ChatBot accessToken={session?.access_token} />
+                  {session && (
+                    <div className="user-panel">
+                      <div className="user-panel-header">
+                        <div>
+                          <p className="user-panel-title">Tu cuenta</p>
+                          <p className="user-panel-email">{userInfo?.email || 'Cuenta activa'}</p>
+                        </div>
+                        <span className={`user-plan ${userInfo?.isPro ? 'pro' : 'free'}`}>
+                          {userInfo?.isPro ? 'Pro' : 'Gratis'}
+                        </span>
+                      </div>
+                      {userLoading ? (
+                        <p className="user-panel-status">Actualizando datos...</p>
+                      ) : userInfo ? (
+                        <div className="user-panel-grid">
+                          <div>
+                            <p className="user-panel-label">Límite diario</p>
+                            <p className="user-panel-value">{userInfo.dailyLimit}</p>
+                          </div>
+                          <div>
+                            <p className="user-panel-label">Usados hoy</p>
+                            <p className="user-panel-value">{userInfo.dailyCount}</p>
+                          </div>
+                          <div>
+                            <p className="user-panel-label">Fecha</p>
+                            <p className="user-panel-value">{userInfo.date}</p>
+                          </div>
+                        </div>
+                      ) : (
+                        <p className="user-panel-status">No pudimos cargar tus datos.</p>
+                      )}
+                    </div>
+                  )}
                   {!session && (
                     <div className="auth-cta" id="auth-panel">
                       <p>Si te gustó, creá tu cuenta y accedé al plan Pro.</p>

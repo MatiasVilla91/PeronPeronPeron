@@ -9,6 +9,7 @@ const generarAudio = require('./voz/voz');
 const peronRouter = require('./routes/peron');
 const subscribeRouter = require('./routes/subscribe');
 const mercadopagoWebhook = require('./routes/mercadopagoWebhook');
+const meRouter = require('./routes/me');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -63,6 +64,7 @@ app.use('/audios', express.static(path.join(__dirname, 'voz')));
 app.use('/api/', apiLimiter);
 app.use('/api/peron', peronRouter);
 app.use('/api/subscribe', subscribeLimiter, subscribeRouter);
+app.use('/api/me', meRouter);
 app.use('/webhooks/mercadopago', mercadopagoWebhook);
 
 // Ruta de prueba basica
