@@ -5,6 +5,8 @@ require('dotenv').config();
 
 const generarAudio = require('./voz/voz');
 const peronRouter = require('./routes/peron');
+const subscribeRouter = require('./routes/subscribe');
+const mercadopagoWebhook = require('./routes/mercadopagoWebhook');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -38,6 +40,8 @@ app.use('/audios', express.static(path.join(__dirname, 'voz')));
 
 // API del Bot Peron
 app.use('/api/peron', peronRouter);
+app.use('/api/subscribe', subscribeRouter);
+app.use('/webhooks/mercadopago', mercadopagoWebhook);
 
 // Ruta de prueba basica
 app.get('/', (req, res) => {

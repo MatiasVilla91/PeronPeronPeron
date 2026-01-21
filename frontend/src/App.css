@@ -442,6 +442,18 @@
   border-color: rgba(12, 90, 166, 0.2);
 }
 
+.plan-card .pro-cta {
+  margin-top: 0.8rem;
+  width: 100%;
+}
+
+.plan-status {
+  margin: 0.6rem 0 0;
+  color: var(--ink-700);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
 .plan-title {
   margin: 0;
   font-weight: 700;

@@ -8,8 +8,10 @@ import './App.css';
 function App() {
   const [session, setSession] = useState(null);
   const [isRecovery, setIsRecovery] = useState(false);
+  const [subscribeStatus, setSubscribeStatus] = useState('');
 
   useEffect(() => {
+    setIsRecovery(window.location.hash.includes('type=recovery'));
     if (supabaseReady) {
       supabase.auth.getSession().then(({ data }) => {
         setSession(data.session);
@@ -21,13 +23,41 @@ function App() {
         listener?.subscription?.unsubscribe();
       };
     }
-    setIsRecovery(window.location.hash.includes('type=recovery'));
   }, []);
 
   const handleSignOut = async () => {
     if (supabaseReady) {
       await supabase.auth.signOut();
       setSession(null);
+    }
+  };
+
+  const handleSubscribe = async () => {
+    setSubscribeStatus('');
+    if (!session?.access_token) {
+      setSubscribeStatus('IniciÃ¡ sesiÃ³n para suscribirte al Plan Pro.');
+      const panel = document.getElementById('auth-panel');
+      panel?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+
+    try {
+      setSubscribeStatus('Generando suscripciÃ³n...');
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/subscribe`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${session.access_token}`
+        }
+      });
+      const data = await res.json();
+      if (!res.ok || !data.init_point) {
+        setSubscribeStatus('No pudimos iniciar la suscripciÃ³n. ProbÃ¡ de nuevo.');
+        return;
+      }
+      window.location.href = data.init_point;
+    } catch (error) {
+      setSubscribeStatus('No pudimos iniciar la suscripciÃ³n. ProbÃ¡ de nuevo.');
     }
   };
 
@@ -237,6 +267,10 @@ function App() {
                 <p className="plan-title">Plan Pro</p>
                 <p className="plan-price">$7.500 ARS / mes</p>
                 <p className="plan-detail">Ilimitado · Historial · Prioridad</p>
+                <button className="cta pro-cta" type="button" onClick={handleSubscribe}>
+                  Quiero Pro
+                </button>
+                {subscribeStatus && <p className="plan-status">{subscribeStatus}</p>}
               </div>
             </div>
             <div className="chat-shell">
@@ -253,7 +287,7 @@ function App() {
                 <>
                   <ChatBot accessToken={session?.access_token} />
                   {!session && (
-                    <div className="auth-cta">
+                    <div className="auth-cta" id="auth-panel">
                       <p>Si te gustó, creá tu cuenta y accedé al plan Pro.</p>
                       <AuthPanel onAuth={setSession} />
                     </div>
