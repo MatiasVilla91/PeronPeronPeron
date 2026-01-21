@@ -50,9 +50,16 @@ function App() {
           Authorization: `Bearer ${session.access_token}`
         }
       });
-      const data = await res.json();
-      if (!res.ok || !data.init_point) {
-        setSubscribeStatus(`No pudimos iniciar la suscripciÃ³n. ${data?.details || 'ProbÃ¡ de nuevo.'}`);
+      let data = null;
+      let rawText = '';
+      try {
+        data = await res.json();
+      } catch (error) {
+        rawText = await res.text();
+      }
+      if (!res.ok || !data?.init_point) {
+        const detail = data?.details || rawText || 'ProbÃ¡ de nuevo.';
+        setSubscribeStatus(`No pudimos iniciar la suscripciÃ³n. ${detail}`);
         return;
       }
       window.location.href = data.init_point;
