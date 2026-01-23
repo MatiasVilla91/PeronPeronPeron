@@ -303,7 +303,6 @@ function App() {
               </div>
             </div>
           </div>
-        </div>
         </section>
 
         <section id="propuesta" className="section alt">
@@ -318,19 +317,19 @@ function App() {
             
             <div className="program-grid">
               <article className="program-card">
-                <div className="program-icon">???</div>
+                <div className="program-icon">>>></div>
                 <h3>Entrenamiento historico</h3>
                 <p>Base documental curada para mayor fidelidad.</p>
                 <span className="program-tag">Claro</span>
               </article>
               <article className="program-card">
-                <div className="program-icon">???</div>
+                <div className="program-icon">>>></div>
                 <h3>Respuesta en personaje</h3>
                 <p>Tono y estilo consistentes en cada respuesta.</p>
                 <span className="program-tag">Confianza</span>
               </article>
               <article className="program-card">
-                <div className="program-icon">???</div>
+                <div className="program-icon">>>></div>
                 <h3>Acceso simple</h3>
                 <p>Entras, preguntas, y conversas al instante.</p>
                 <span className="program-tag">Accion</span>
