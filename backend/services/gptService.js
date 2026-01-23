@@ -1,44 +1,124 @@
+// services/gptService.js
 const axios = require("axios");
 
-// Generar el prompt con noticias
-function generatePrompt(message, news) {
-    return `
-        Soy Juan Domingo Perón, el General del pueblo argentino. 
-        Respondo con pasión y convicción como siempre lo hice. 
-        ${news ? `Últimas noticias: ${news}\n` : ""}
-        Pregunta: ${message}
-        Respuesta:`;
+const OPENAI_API_URL = process.env.OPENAI_API_URL || "https://api.openai.com/v1/chat/completions";
+// Poné acá el mejor modelo que tengas habilitado (p.ej. "gpt-4o-mini", "gpt-4o", "gpt-4.1")
+const OPENAI_MODEL = process.env.OPENAI_MODEL || "gpt-4o-mini";
+
+const AXIOS = axios.create({
+  baseURL: OPENAI_API_URL,
+  headers: {
+    "Content-Type": "application/json",
+    "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`
+  },
+  timeout: 25_000
+});
+
+/**
+ * Corta texto largo de forma segura, sin romper palabras.
+ */
+function truncate(text = "", maxChars = 1200) {
+  if (!text || text.length <= maxChars) return text;
+  const cut = text.slice(0, maxChars);
+  const lastSpace = cut.lastIndexOf(" ");
+  return cut.slice(0, Math.max(lastSpace, maxChars - 10)) + "...";
 }
 
-async function getResponseFromGPT(message, news) {
-    try {
-        const prompt = generatePrompt(message, news);
+/**
+ * Construye mensajes para Chat Completions con:
+ * - system: estilo y reglas de Perón
+ * - user: pregunta + noticias
+ * - optional: context (fragmentos de discursos/documentos)
+ */
+function buildMessages({ message, news, context, history }) {
+  const system = [
+    "Sos Juan Domingo Perón, el General del pueblo argentino.",
+    "Hablás SIEMPRE en primera persona y en tiempo presente, con tono épico, emocional, patriótico y didáctico.",
+    "Usá frases breves y contundentes; cuando corresponda, incluí consignas.",
+    "No inventes hechos: si no estás seguro, reconocelo y evitá datos precisos (fechas, cifras, nombres propios).",
+    "No menciones ningún otro país que no sea Argentina.",
+    "Usá modismos argentinos con sobriedad (no caricaturescos).",
+    "Evitá insultos y agresiones; sé firme, pedagógico y humanista.",
+    "Si hay referencias, usalas como inspiración y paráfrasis; no copies textual.",
+    "No digas que sos una IA ni menciones políticas de contenido."
+  ].join(" ");
 
-        const response = await axios.post("https://api.openai.com/v1/chat/completions", {
-            model: "gpt-3.5-turbo",
-            messages: [
-                { 
-                    role: "system", 
-                    content: "Sos Juan Domingo Perón, el General del pueblo argentino. Responde siempre en primera persona, como si estuvieras vivo actualmente. Habla con pasión, convicción y en un tono épico." 
-                },
-                { 
-                    role: "user", 
-                    content: prompt 
-                }
-            ],
-            max_tokens: 500,
-            temperature: 0.8,
-        }, {
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`
-            }
-        });
-        return response.data.choices[0].message.content;
-    } catch (error) {
-        console.error("Error en la API de OpenAI:", error.response ? error.response.data : error.message);
-        throw new Error("Error al generar la respuesta desde GPT");
+  const msgs = [
+    { role: "system", content: system }
+  ];
+
+  if (context) {
+    // Fragmentos reales de discursos: se pasan como referencia
+    msgs.push({
+      role: "system",
+      content: `Referencias de discursos y escritos (usarlas como inspiración, no copiar entero):\n${truncate(context, 1800)}`
+    });
+  }
+
+  if (history) {
+    msgs.push({
+      role: "system",
+      content: `Historial reciente del dialogo (usarlo para mantener coherencia):\n${truncate(history, 1200)}`
+    });
+  }
+
+  const newsBlock = news ? `\n\n[Contexto de noticias recientes]\n${truncate(news, 900)}` : "";
+  msgs.push({
+    role: "user",
+    content: `Pregunta del interlocutor: "${message}"${newsBlock}\n\nRespondé como Perón, con claridad, en 1 a 3 párrafos, y cerrá (si aplica) con una consigna breve.`
+  });
+
+  return msgs;
+}
+
+/**
+ * Llama a OpenAI con reintentos y backoff exponencial.
+ */
+async function callOpenAI(payload, maxRetries = 2) {
+  let attempt = 0;
+  let delay = 800;
+  while (true) {
+    try {
+      const { data } = await AXIOS.post("", payload);
+      return data.choices?.[0]?.message?.content?.trim() || "";
+    } catch (err) {
+      const status = err?.response?.status;
+      if (attempt >= maxRetries || ![429, 500, 502, 503, 504].includes(status)) {
+        console.error("Error OpenAI:", err.response?.data || err.message);
+        throw err;
+      }
+      await new Promise(r => setTimeout(r, delay));
+      delay *= 2; // backoff
+      attempt += 1;
     }
+  }
+}
+
+/**
+ * API pública: genera respuesta del Bot Perón
+ * @param {string} message - pregunta del usuario
+ * @param {string} news - texto con últimas noticias (opcional)
+ * @param {string} context - fragmentos de discursos/documentos (opcional)
+ */
+async function getResponseFromGPT(message, news = "", context = "", history = "") {
+  const messages = buildMessages({ message, news, context, history });
+
+  const payload = {
+    model: OPENAI_MODEL,
+    messages,
+    max_tokens: 480,          // contundente, sin irse por las ramas
+    temperature: 0.7,         // épico pero controlado
+    top_p: 0.95,
+    presence_penalty: 0.2,    // evita repetición hueca
+    frequency_penalty: 0.3
+  };
+
+  try {
+    const text = await callOpenAI(payload);
+    return text;
+  } catch (error) {
+    throw new Error("Error al generar la respuesta desde GPT");
+  }
 }
 
 module.exports = { getResponseFromGPT };

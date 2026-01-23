@@ -8,6 +8,8 @@ const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
 const dailyLimit = Number(process.env.FREE_DAILY_LIMIT || 3);
 const maxInputChars = Number(process.env.MAX_INPUT_CHARS || 800);
+const historyLimit = Number(process.env.HISTORY_LIMIT || 8);
+const maxHistoryChars = Number(process.env.MAX_HISTORY_CHARS || 1600);
 const anonUsage = new Map();
 
 if (!supabaseUrl || !supabaseAnonKey) {
@@ -40,6 +42,23 @@ const getClientIp = (req) => {
     return forwarded[0];
   }
   return req.ip || 'unknown';
+};
+
+const truncate = (text = "", maxChars = 1600) => {
+  if (!text || text.length <= maxChars) return text;
+  const cut = text.slice(0, maxChars);
+  const lastSpace = cut.lastIndexOf(" ");
+  return cut.slice(0, Math.max(lastSpace, maxChars - 10)) + "...";
+};
+
+const formatHistory = (items = []) => {
+  if (!items.length) return "";
+  const lines = items.map((item) => {
+    const role = item.role === "peron" ? "Peron" : "Usuario";
+    const text = String(item.text || "").replace(/\s+/g, " ").trim();
+    return `${role}: ${text}`;
+  });
+  return truncate(lines.join("\n"), maxHistoryChars);
 };
 
 router.post('/', async (req, res) => {
@@ -101,9 +120,23 @@ router.post('/', async (req, res) => {
   }
 
   try {
-    const respuestaTexto = await getPeronResponse(texto);
+    let historyText = "";
+    if (token && supabaseAuthed && user) {
+      const { data: historyItems } = await supabaseAuthed
+        .from('chat_history')
+        .select('role, text, created_at')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(historyLimit);
 
-  if (token && supabaseAuthed && user) {
+      if (historyItems && historyItems.length) {
+        historyText = formatHistory(historyItems.slice().reverse());
+      }
+    }
+
+    const respuestaTexto = await getPeronResponse(texto, historyText);
+
+    if (token && supabaseAuthed && user) {
       await supabaseAuthed.from('usage_daily').upsert({
         user_id: user.id,
         date: today,

@@ -1,28 +1,23 @@
+// controllers/chatbotController.js
 const { getResponseFromGPT } = require("../services/gptService");
-const { getResponseFromDocs } = require("./trainController");
+const { getRelevantContext } = require("./trainController");
 const { getLatestNews } = require("../services/newsService");
 
-async function getPeronResponse(message) {
-    try {
-        // Intentar obtener la respuesta desde los documentos cargados
-        const docResponse = getResponseFromDocs(message);
-        if (docResponse) {
-            console.log("Respuesta desde documentos:", docResponse);
-            return docResponse;
-        }
+async function getPeronResponse(message, history = "") {
+  try {
+    // 1) Traer fragmentos de discursos relacionados
+    const context = await getRelevantContext(message);
 
-        // Obtener noticias actuales
-        const noticias = await getLatestNews();
+    // 2) Noticias (opcionales)
+    const noticias = await getLatestNews();
 
-        // Obtener la respuesta del bot
-        const gptResponse = await getResponseFromGPT(message, noticias);
-        console.log("Respuesta generada por GPT:", gptResponse);
-        return gptResponse;
-
-    } catch (error) {
-        console.error("Error en el chatbot:", error.message);
-        throw new Error("Error al generar la respuesta desde el bot");
-    }
+    // 3) Respuesta final (usa ambos)
+    const gptResponse = await getResponseFromGPT(message, noticias, context, history);
+    return gptResponse;
+  } catch (error) {
+    console.error("Error en el chatbot:", error.message);
+    throw new Error("Error al generar la respuesta desde el bot");
+  }
 }
 
 module.exports = { getPeronResponse };
