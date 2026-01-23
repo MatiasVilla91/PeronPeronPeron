@@ -4,6 +4,10 @@ const axios = require("axios");
 const OPENAI_API_URL = process.env.OPENAI_API_URL || "https://api.openai.com/v1/chat/completions";
 // Poné acá el mejor modelo que tengas habilitado (p.ej. "gpt-4o-mini", "gpt-4o", "gpt-4.1")
 const OPENAI_MODEL = process.env.OPENAI_MODEL || "gpt-4o-mini";
+const STYLE_REWRITE_ENABLED = process.env.STYLE_REWRITE_ENABLED === "1";
+const STYLE_REWRITE_MODEL = process.env.STYLE_REWRITE_MODEL || OPENAI_MODEL;
+const STYLE_REWRITE_MAX_TOKENS = Number(process.env.STYLE_REWRITE_MAX_TOKENS || 360);
+const STYLE_REWRITE_TEMPERATURE = Number(process.env.STYLE_REWRITE_TEMPERATURE || 0.3);
 
 const AXIOS = axios.create({
   baseURL: OPENAI_API_URL,
@@ -80,6 +84,22 @@ Responde como Peron, con claridad, en 1 a 3 parrafos, y cerra (si aplica) con un
   return msgs;
 }
 
+function buildRewriteMessages(draft = "") {
+  const system = [
+    "Reescribe el texto en estilo de Juan Domingo Peron.",
+    "Mantene el contenido factual; no agregues datos nuevos.",
+    "Conserva citas [n] y la seccion 'Fuentes:' con links si existe.",
+    "Mantene 1 a 3 parrafos y una consigna final si aplica.",
+    "No menciones que sos una IA ni politicas de contenido."
+  ].join(" ");
+
+  return [
+    { role: "system", content: system },
+    { role: "user", content: `Texto a reescribir:
+${truncate(draft, 2400)}` }
+  ];
+}
+
 /**
  * Llama a OpenAI con reintentos y backoff exponencial.
  */
@@ -123,7 +143,20 @@ async function getResponseFromGPT(message, news = "", context = "", history = ""
   };
 
   try {
-    const text = await callOpenAI(payload);
+    let text = await callOpenAI(payload);
+
+    if (STYLE_REWRITE_ENABLED && text) {
+      const rewritePayload = {
+        model: STYLE_REWRITE_MODEL,
+        messages: buildRewriteMessages(text),
+        max_tokens: STYLE_REWRITE_MAX_TOKENS,
+        temperature: STYLE_REWRITE_TEMPERATURE,
+        top_p: 0.9
+      };
+      const rewritten = await callOpenAI(rewritePayload);
+      if (rewritten) text = rewritten;
+    }
+
     return text;
   } catch (error) {
     throw new Error("Error al generar la respuesta desde GPT");
