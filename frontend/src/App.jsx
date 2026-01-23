@@ -15,6 +15,7 @@ function App() {
   const [historyLoading, setHistoryLoading] = useState(false);
   const [subscriptionInfo, setSubscriptionInfo] = useState(null);
   const [subscriptionStatus, setSubscriptionStatus] = useState('');
+  const [authOpen, setAuthOpen] = useState(false);
 
   useEffect(() => {
     setIsRecovery(window.location.hash.includes('type=recovery'));
@@ -112,14 +113,13 @@ function App() {
   const handleSubscribe = async () => {
     setSubscribeStatus('');
     if (!session?.access_token) {
-      setSubscribeStatus('IniciÃ¡ sesiÃ³n para suscribirte al Plan Pro.');
-      const panel = document.getElementById('auth-panel');
-      panel?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      setSubscribeStatus('Inicia sesion para suscribirte al Plan Pro.');
+      setAuthOpen(true);
       return;
     }
 
     try {
-      setSubscribeStatus('Generando suscripciÃ³n...');
+      setSubscribeStatus('Generando suscripcion...');
       const res = await fetch(`${import.meta.env.VITE_API_URL}/api/subscribe`, {
         method: 'POST',
         headers: {
@@ -141,7 +141,7 @@ function App() {
       }
       window.location.href = data.init_point;
     } catch (error) {
-      setSubscribeStatus('No pudimos iniciar la suscripciÃ³n. ProbÃ¡ de nuevo.');
+      setSubscribeStatus('No pudimos iniciar la suscripcion. Proba de nuevo.');
     }
   };
 
@@ -159,13 +159,13 @@ function App() {
       });
       const data = await res.json();
       if (!res.ok) {
-        setSubscriptionStatus('No pudimos actualizar la suscripción.');
+        setSubscriptionStatus('No pudimos actualizar la suscripcion.');
         return;
       }
       setSubscriptionStatus(`Estado actualizado: ${data.status}`);
       setSubscriptionInfo((prev) => prev ? { ...prev, status: data.status, hasSubscription: true } : prev);
     } catch (error) {
-      setSubscriptionStatus('No pudimos actualizar la suscripción.');
+      setSubscriptionStatus('No pudimos actualizar la suscripcion.');
     }
   };
 
@@ -380,6 +380,15 @@ function App() {
                 </button>
                 {subscribeStatus && <p className="plan-status">{subscribeStatus}</p>}
               </div>
+              {!session && (
+                <div className="access-card">
+                  <p className="access-title">Accede a tu cuenta</p>
+                  <p className="access-text">Guarda tu historial y desbloquea el plan Pro.</p>
+                  <button className="cta" type="button" onClick={() => setAuthOpen(true)}>
+                    Iniciar sesion
+                  </button>
+                </div>
+              )}
             </div>
             <div className="chat-shell">
               {!supabaseReady ? (
@@ -466,18 +475,32 @@ function App() {
                       </div>
                     </div>
                   )}
-                  {!session && (
-                    <div className="auth-cta" id="auth-panel">
-                      <p>Si te gustó, creá tu cuenta y accedé al plan Pro.</p>
-                      <AuthPanel onAuth={setSession} />
-                    </div>
-                  )}
                 </>
               )}
             </div>
           </div>
         </section>
       </main>
+
+      {authOpen && !session && (
+        <div className="auth-modal-backdrop" role="dialog" aria-modal="true">
+          <div className="auth-modal">
+            <div className="auth-modal-header">
+              <div>
+                <p className="auth-modal-title">Ingresa a tu cuenta</p>
+                <p className="auth-modal-subtitle">Continua la conversacion con acceso completo.</p>
+              </div>
+              <button className="auth-modal-close" type="button" onClick={() => setAuthOpen(false)}>
+                Cerrar
+              </button>
+            </div>
+            <AuthPanel onAuth={(nextSession) => {
+              setSession(nextSession);
+              setAuthOpen(false);
+            }} />
+          </div>
+        </div>
+      )}
 
       <footer className="site-footer">
         <div className="container footer-inner">

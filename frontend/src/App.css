@@ -447,6 +447,30 @@
   width: 100%;
 }
 
+.access-card {
+  margin-top: 1.2rem;
+  padding: 1.4rem 1.6rem;
+  border-radius: 20px;
+  background: linear-gradient(135deg, rgba(12, 90, 166, 0.12), rgba(255, 227, 168, 0.28));
+  border: 1px solid rgba(12, 90, 166, 0.2);
+  box-shadow: 0 18px 34px rgba(16, 88, 156, 0.14);
+  display: grid;
+  gap: 0.6rem;
+}
+
+.access-title {
+  margin: 0;
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--ink-900);
+}
+
+.access-text {
+  margin: 0;
+  color: var(--ink-600);
+  font-size: 0.95rem;
+}
+
 .plan-status {
   margin: 0.6rem 0 0;
   color: var(--ink-700);
@@ -824,6 +848,70 @@
   font-weight: 600;
   cursor: pointer;
   padding: 0;
+}
+
+.auth-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(7, 25, 48, 0.55);
+  display: grid;
+  place-items: center;
+  z-index: 30;
+  padding: 1.5rem;
+  backdrop-filter: blur(8px);
+}
+
+.auth-modal {
+  width: min(520px, 100%);
+  background: white;
+  border-radius: 24px;
+  padding: 1.6rem;
+  border: 1px solid rgba(3, 46, 99, 0.12);
+  box-shadow: 0 26px 50px rgba(7, 25, 48, 0.25);
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: modalFade 0.2s ease-out;
+}
+
+.auth-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.2rem;
+}
+
+.auth-modal-title {
+  margin: 0;
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.auth-modal-subtitle {
+  margin: 0.3rem 0 0;
+  color: var(--ink-600);
+  font-size: 0.95rem;
+}
+
+.auth-modal-close {
+  border: none;
+  background: rgba(12, 90, 166, 0.12);
+  color: var(--sky-800);
+  padding: 0.4rem 0.9rem;
+  border-radius: 999px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+@keyframes modalFade {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @media (max-width: 900px) {
