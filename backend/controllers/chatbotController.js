@@ -2,6 +2,7 @@
 const { getResponseFromGPT } = require("../services/gptService");
 const { getRelevantContext } = require("./trainController");
 const { getLatestNews } = require("../services/newsService");
+const { getWebContext } = require("../services/webSearchService");
 
 async function getPeronResponse(message, history = "") {
   try {
@@ -11,8 +12,11 @@ async function getPeronResponse(message, history = "") {
     // 2) Noticias (opcionales)
     const noticias = await getLatestNews();
 
-    // 3) Respuesta final (usa ambos)
-    const gptResponse = await getResponseFromGPT(message, noticias, context, history);
+    // 3) Contexto web (opcionales, con fuentes)
+    const webContext = await getWebContext(message);
+
+    // 4) Respuesta final (usa ambos)
+    const gptResponse = await getResponseFromGPT(message, noticias, context, history, webContext);
     return gptResponse;
   } catch (error) {
     console.error("Error en el chatbot:", error.message);

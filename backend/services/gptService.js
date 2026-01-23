@@ -30,7 +30,7 @@ function truncate(text = "", maxChars = 1200) {
  * - user: pregunta + noticias
  * - optional: context (fragmentos de discursos/documentos)
  */
-function buildMessages({ message, news, context, history }) {
+function buildMessages({ message, news, context, history, webContext }) {
   const system = [
     "Sos Juan Domingo Perón, el General del pueblo argentino.",
     "Hablás SIEMPRE en primera persona y en tiempo presente, con tono épico, emocional, patriótico y didáctico.",
@@ -62,10 +62,19 @@ function buildMessages({ message, news, context, history }) {
     });
   }
 
+  if (webContext) {
+    msgs.push({
+      role: "system",
+      content: `Fuentes web recientes (usar para hechos actuales y citar con [n]):\n${truncate(webContext, 1800)}`
+    });
+  }
+
   const newsBlock = news ? `\n\n[Contexto de noticias recientes]\n${truncate(news, 900)}` : "";
   msgs.push({
     role: "user",
-    content: `Pregunta del interlocutor: "${message}"${newsBlock}\n\nRespondé como Perón, con claridad, en 1 a 3 párrafos, y cerrá (si aplica) con una consigna breve.`
+    content: `Pregunta del interlocutor: "${message}"${newsBlock}
+
+Responde como Peron, con claridad, en 1 a 3 parrafos, y cerra (si aplica) con una consigna breve. Si usas fuentes web, cita con [n] y al final agrega "Fuentes:" con los links.`
   });
 
   return msgs;
@@ -100,8 +109,8 @@ async function callOpenAI(payload, maxRetries = 2) {
  * @param {string} news - texto con últimas noticias (opcional)
  * @param {string} context - fragmentos de discursos/documentos (opcional)
  */
-async function getResponseFromGPT(message, news = "", context = "", history = "") {
-  const messages = buildMessages({ message, news, context, history });
+async function getResponseFromGPT(message, news = "", context = "", history = "", webContext = "") {
+  const messages = buildMessages({ message, news, context, history, webContext });
 
   const payload = {
     model: OPENAI_MODEL,
