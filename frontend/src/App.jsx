@@ -211,28 +211,28 @@ function App() {
         <section className="hero">
           <div className="container hero-grid">
             <div className="hero-copy">
-              <p className="eyebrow">Soberanía · Justicia social · Independencia económica</p>
-              <h1>Hablemos claro, entre nosotros.</h1>
+              <p className="eyebrow">IA entrenada con Peron - Voz historica - Presente vivo</p>
+              <h1>Escucha al Peron de hoy.</h1>
               <p className="lead">
-                Esta plataforma está pensada para vos: directa, cercana y con identidad.
-                Queremos que la conversación sea simple, útil y bien nuestra.
+                Creamos una IA entrenada con discursos, cartas y documentos reales de Juan Domingo Peron.
+                Responde en su estilo, con claridad y conviccion, para ayudarte a entender el presente desde una mirada historica.
               </p>
               <div className="hero-actions">
                 <a className="cta" href="#chat">Quiero conversar</a>
-                <a className="ghost" href="#propuesta">Ver la propuesta</a>
+                <a className="ghost" href="#propuesta">Ver como funciona</a>
               </div>
               <div className="stats">
                 <div className="stat-card">
                   <span className="stat-number">24/7</span>
-                  <span className="stat-label">Acompañamiento siempre</span>
+                  <span className="stat-label">Respuesta en minutos</span>
                 </div>
                 <div className="stat-card">
                   <span className="stat-number">+120</span>
-                  <span className="stat-label">Ideas en marcha</span>
+                  <span className="stat-label">Respuestas con identidad</span>
                 </div>
                 <div className="stat-card">
                   <span className="stat-number">100%</span>
-                  <span className="stat-label">Identidad popular</span>
+                  <span className="stat-label">Base documental real</span>
                 </div>
               </div>
             </div>
@@ -278,60 +278,62 @@ function App() {
           <div className="container section-grid">
             <div>
               <p className="section-eyebrow">Contexto</p>
-              <h2>La historia arranca en la calle.</h2>
+              <h2>Una IA con memoria historica.</h2>
               <p className="section-lead">
-                Todos queremos lo mismo: que nos escuchen y que las cosas mejoren.
-                Acá la conversación es simple y directa, sin vueltas.
+                No es un chatbot cualquiera. Es una reconstruccion de voz y pensamiento,
+                entrenada con fuentes reales para hablar como Peron.
               </p>
             </div>
+            
             <div className="story-cards">
               <div className="story-card">
                 <span className="story-tag">01</span>
-                <h3>Lo que duele</h3>
-                <p>Demasiado ruido, poca claridad y promesas que no llegan.</p>
+                <h3>Entrenamiento real</h3>
+                <p>Discursos, documentos y cartas autenticas.</p>
               </div>
               <div className="story-card">
                 <span className="story-tag">02</span>
-                <h3>Lo que queremos</h3>
-                <p>Información clara, respuestas rápidas y un rumbo firme.</p>
+                <h3>Voz coherente</h3>
+                <p>Responde con el estilo y el lenguaje de la epoca.</p>
               </div>
               <div className="story-card">
                 <span className="story-tag">03</span>
-                <h3>Lo que hacemos</h3>
-                <p>Una herramienta simple para conversar y decidir mejor.</p>
+                <h3>Uso ciudadano</h3>
+                <p>Pensada para dialogar, aprender y debatir con identidad.</p>
               </div>
             </div>
           </div>
+        </div>
         </section>
 
         <section id="propuesta" className="section alt">
           <div className="container">
             <div className="section-header">
               <p className="section-eyebrow">Propuesta</p>
-              <h2>Una propuesta clara, con identidad y rumbo.</h2>
+              <h2>Una experiencia unica, con rigor historico.</h2>
               <p className="section-lead">
-                Explicamos lo importante de forma simple para que cualquiera lo entienda,
-                lo comparta y lo haga propio.
+                Un asistente entrenado para hablar como Peron, con datos reales y una voz reconocible.
               </p>
             </div>
+            
             <div className="program-grid">
               <article className="program-card">
-                <div className="program-icon">⚡</div>
-                <h3>Mensaje directo</h3>
-                <p>Una idea central que se entiende en dos líneas.</p>
+                <div className="program-icon">???</div>
+                <h3>Entrenamiento historico</h3>
+                <p>Base documental curada para mayor fidelidad.</p>
                 <span className="program-tag">Claro</span>
               </article>
               <article className="program-card">
-                <div className="program-icon">◎</div>
-                <h3>Confianza real</h3>
-                <p>Hechos y datos que hablan por sí solos.</p>
+                <div className="program-icon">???</div>
+                <h3>Respuesta en personaje</h3>
+                <p>Tono y estilo consistentes en cada respuesta.</p>
                 <span className="program-tag">Confianza</span>
               </article>
               <article className="program-card">
-                <div className="program-icon">✶</div>
-                <h3>Participación</h3>
-                <p>Sumarse es simple, rápido y sin trabas.</p>
-                <span className="program-tag">Acción</span>
+                <div className="program-icon">???</div>
+                <h3>Acceso simple</h3>
+                <p>Entras, preguntas, y conversas al instante.</p>
+                <span className="program-tag">Accion</span>
               </article>
             </div>
           </div>
@@ -341,24 +343,24 @@ function App() {
           <div className="container section-grid">
             <div>
               <p className="section-eyebrow">Impacto</p>
-              <h2>Resultados que se notan.</h2>
+              <h2>Una forma nueva de aprender historia.</h2>
               <p className="section-lead">
-                No es solo diseño: es una forma de contar mejor lo que hacemos
-                y de sumar a más gente todos los días.
+                Mas cercano, mas directo y mas nuestro.
               </p>
             </div>
+            
             <div className="impact-grid">
               <div className="impact-card">
                 <p className="impact-number">+68%</p>
-                <p className="impact-label">Más gente entiende el mensaje</p>
+                <p className="impact-label">Conversacion mas clara</p>
               </div>
               <div className="impact-card">
                 <p className="impact-number">3x</p>
-                <p className="impact-label">Más conversación real</p>
+                <p className="impact-label">Mas participacion</p>
               </div>
               <div className="impact-card">
                 <p className="impact-number">24h</p>
-                <p className="impact-label">Respuesta siempre disponible</p>
+                <p className="impact-label">Acceso inmediato</p>
               </div>
             </div>
           </div>
@@ -368,24 +370,23 @@ function App() {
           <div className="container chat-grid">
             <div className="chat-intro">
               <p className="section-eyebrow">Chat ciudadano</p>
-              <h2>Hablemos como corresponde, sin vueltas.</h2>
+              <h2>Proba ahora.</h2>
               <p className="section-lead">
-                Este espacio es para preguntar, opinar y entender mejor.
-                Estamos para escucharte y responderte.
+                Hacelo una pregunta y recibi una respuesta con identidad peronista.
               </p>
               <div className="chat-callout">
-                <span>Respuesta inmediata</span>
-                <strong>Un canal directo con voz cercana</strong>
+                <span>Respuestas con fuentes</span>
+                <strong>Estilo autentico y documentado</strong>
               </div>
               <div className="plan-card">
                 <p className="plan-title">Plan Gratis</p>
                 <p className="plan-price">$0</p>
-                <p className="plan-detail">3 preguntas por día · Sin vueltas</p>
+                <p className="plan-detail">3 preguntas por dia - Acceso inmediato</p>
               </div>
               <div className="plan-card pro">
                 <p className="plan-title">Plan Pro</p>
                 <p className="plan-price">$7.500 ARS / mes</p>
-                <p className="plan-detail">Ilimitado · Historial · Prioridad</p>
+                <p className="plan-detail">Ilimitado - Historial - Prioridad</p>
                 <button className="cta pro-cta" type="button" onClick={handleSubscribe}>
                   Quiero Pro
                 </button>
@@ -520,7 +521,7 @@ function App() {
 
       <footer className="site-footer">
         <div className="container footer-inner">
-          <p>Proyecto PERON · Hecho con identidad y cercanía.</p>
+          <p>Proyecto PERON - IA historica con identidad.</p>
           <div className="footer-links">
             <a href="#contexto">Contexto</a>
             <a href="#propuesta">Propuesta</a>
