@@ -33,6 +33,15 @@ function App() {
   }, []);
 
   useEffect(() => {
+    if (!authOpen) return;
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') setAuthOpen(false);
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [authOpen]);
+
+  useEffect(() => {
     const fetchUser = async () => {
       if (!session?.access_token) {
         setUserInfo(null);
@@ -190,7 +199,9 @@ function App() {
             {session ? (
               <button className="ghost small" onClick={handleSignOut}>Salir</button>
             ) : (
-              <a className="cta small" href="#chat">Sumarse</a>
+              <button className="cta small" type="button" onClick={() => setAuthOpen(true)}>
+                Sumarse
+              </button>
             )}
           </div>
         </div>
@@ -483,8 +494,13 @@ function App() {
       </main>
 
       {authOpen && !session && (
-        <div className="auth-modal-backdrop" role="dialog" aria-modal="true">
-          <div className="auth-modal">
+        <div
+          className="auth-modal-backdrop"
+          role="dialog"
+          aria-modal="true"
+          onClick={() => setAuthOpen(false)}
+        >
+          <div className="auth-modal" onClick={(event) => event.stopPropagation()}>
             <div className="auth-modal-header">
               <div>
                 <p className="auth-modal-title">Ingresa a tu cuenta</p>
