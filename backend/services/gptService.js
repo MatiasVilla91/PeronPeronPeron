@@ -169,8 +169,14 @@ async function getResponseFromGPT(message, news = "", context = "", history = ""
         .replace(/^(\s*["'“”‘’]*\s*)?(querido|queridos)\s+(pueblo|compatriotas|argentinos|argentinas|amigos|hermanos)([^,.]{0,60})?[,\s]+/i, "")
         .replace(/^(\s*["'“”‘’]*\s*)?(querido|queridos)\s+pueblo\s+argentino[,\s]+/i, "");
     }
-    if (text && text.length > 900) {
-      text = truncate(text, 900);
+    if (text && text.length > 1200) {
+      const slice = text.slice(0, 1200);
+      const lastPeriod = Math.max(slice.lastIndexOf("."), slice.lastIndexOf("!"), slice.lastIndexOf("?"));
+      if (lastPeriod > 200) {
+        text = slice.slice(0, lastPeriod + 1);
+      } else {
+        text = truncate(text, 1200);
+      }
     }
     return text;
   } catch (error) {
