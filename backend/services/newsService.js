@@ -16,7 +16,7 @@ async function getLatestNews() {
         return articles.join("\n");
     } catch (error) {
         console.error("Error al obtener noticias:", error.message);
-        return "No pude obtener noticias actuales en este momento.";
+        return "";
     }
 }
 

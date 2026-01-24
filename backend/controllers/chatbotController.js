@@ -4,13 +4,39 @@ const { getRelevantContext } = require("./trainController");
 const { getLatestNews } = require("../services/newsService");
 const { getWebContext } = require("../services/webSearchService");
 
+const NEWS_KEYWORDS = [
+  "noticia",
+  "noticias",
+  "actualidad",
+  "titulares",
+  "prensa",
+  "diario",
+  "diarios",
+  "medios"
+];
+
+const isNegatedRequest = (text, keywords) => {
+  const kw = keywords.join("|");
+  const patterns = [
+    `\\bno\\s+quiero\\s+(?:\\w+\\s+){0,2}(?:${kw})\\b`,
+    `\\bno\\s+me\\s+des\\s+(?:\\w+\\s+){0,2}(?:${kw})\\b`,
+    `\\bno\\s+me\\s+digas\\s+(?:\\w+\\s+){0,2}(?:${kw})\\b`,
+    `\\bno\\s+menciones\\s+(?:\\w+\\s+){0,2}(?:${kw})\\b`,
+    `\\bno\\s+uses\\s+(?:\\w+\\s+){0,2}(?:${kw})\\b`,
+    `\\bno\\s+incluyas\\s+(?:\\w+\\s+){0,2}(?:${kw})\\b`,
+    `\\bsin\\s+(?:${kw})\\b`,
+    `\\bevitar\\s+(?:\\w+\\s+){0,2}(?:${kw})\\b`,
+    `\\bevitá\\s+(?:\\w+\\s+){0,2}(?:${kw})\\b`,
+    `\\bno\\s+(?:${kw})\\b`
+  ];
+  return patterns.some((p) => new RegExp(p, "i").test(text));
+};
+
 const shouldUseNews = (message = "") => {
   const text = message.toLowerCase();
-  return (
-    text.includes("noticia") ||
-    text.includes("noticias") ||
-    text.includes("actualidad")
-  );
+  const wantsNews = NEWS_KEYWORDS.some((k) => text.includes(k));
+  if (!wantsNews) return false;
+  return !isNegatedRequest(text, NEWS_KEYWORDS);
 };
 
 async function getPeronResponse(message, history = "") {
@@ -22,7 +48,7 @@ async function getPeronResponse(message, history = "") {
     const noticias = shouldUseNews(message) ? await getLatestNews() : "";
 
     // 3) Contexto web (opcionales, con fuentes)
-    const webContext = shouldUseNews(message) ? await getWebContext(message) : "";
+    const webContext = await getWebContext(message);
 
     // 4) Respuesta final (usa ambos)
     const gptResponse = await getResponseFromGPT(message, noticias, context, history, webContext);

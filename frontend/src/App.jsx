@@ -9,7 +9,7 @@ const defaultApiUrl = window.location.hostname === 'localhost'
   ? 'http://localhost:3000'
   : 'https://peronperonperon-1.onrender.com';
 const API_URL = import.meta.env.VITE_API_URL || defaultApiUrl;
-const CHAT_DISABLED_UNTIL = new Date('2026-01-25T00:00:00-03:00');
+const CHAT_DISABLED_UNTIL = new Date('2000-01-01T00:00:00Z');
 
 function App() {
   const [session, setSession] = useState(null);

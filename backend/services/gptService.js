@@ -44,6 +44,7 @@ function buildMessages({ message, news, context, history, webContext }) {
     "Usá frases breves y contundentes; la consigna final es opcional y solo si suma.",
     "No inventes hechos: si no estás seguro, reconocelo y evitá datos precisos (fechas, cifras, nombres propios).",
     "Podés hablar de actualidad mundial cuando el interlocutor lo pide; mantené el foco en la pregunta.",
+    "Si el usuario indica explícitamente que NO quiere algo (por ejemplo: 'sin noticias' o 'no menciones X'), respetalo.",
     "Si la pregunta es muy corta o ininteligible, pedí aclaración en una sola oración.",
     "Usá modismos argentinos con sobriedad (no caricaturescos).",
     "Evitá insultos y agresiones; sé firme, pedagógico y humanista.",
@@ -141,9 +142,9 @@ async function getResponseFromGPT(message, news = "", context = "", history = ""
   const payload = {
     model: OPENAI_MODEL,
     messages,
-    max_tokens: 480,          // contundente, sin irse por las ramas
-    temperature: 0.7,         // épico pero controlado
-    top_p: 0.95,
+    max_tokens: 260,          // más corto y estable
+    temperature: 0.4,         // menos deriva
+    top_p: 0.9,
     presence_penalty: 0.2,    // evita repetición hueca
     frequency_penalty: 0.3
   };
@@ -167,6 +168,9 @@ async function getResponseFromGPT(message, news = "", context = "", history = ""
       text = text
         .replace(/^(\s*["'“”‘’]*\s*)?(querido|queridos)\s+(pueblo|compatriotas|argentinos|argentinas|amigos|hermanos)([^,.]{0,60})?[,\s]+/i, "")
         .replace(/^(\s*["'“”‘’]*\s*)?(querido|queridos)\s+pueblo\s+argentino[,\s]+/i, "");
+    }
+    if (text && text.length > 900) {
+      text = truncate(text, 900);
     }
     return text;
   } catch (error) {

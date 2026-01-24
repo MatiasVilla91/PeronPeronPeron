@@ -133,8 +133,6 @@ router.post('/', async (req, res) => {
       return res.status(429).json({ error: 'Daily limit reached' });
     }
   }
-    return res.status(429).json({ error: 'Daily limit reached' });
-  }
 
   try {
     let historyText = "";
