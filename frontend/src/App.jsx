@@ -5,6 +5,11 @@ import ResetPasswordPanel from './components/ResetPasswordPanel';
 import { supabase, supabaseReady } from './lib/supabaseClient';
 import './App.css';
 
+const defaultApiUrl = window.location.hostname === 'localhost'
+  ? 'http://localhost:3000'
+  : 'https://peronperonperon-1.onrender.com';
+const API_URL = import.meta.env.VITE_API_URL || defaultApiUrl;
+
 function App() {
   const [session, setSession] = useState(null);
   const [isRecovery, setIsRecovery] = useState(false);
@@ -51,7 +56,7 @@ function App() {
       }
       try {
         setUserLoading(true);
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/me`, {
+        const res = await fetch(`${API_URL}/api/me`, {
           headers: {
             Authorization: `Bearer ${session.access_token}`
           }
@@ -74,7 +79,7 @@ function App() {
       if (!session?.access_token) return;
       try {
         setHistoryLoading(true);
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/history?limit=20`, {
+        const res = await fetch(`${API_URL}/api/history?limit=20`, {
           headers: {
             Authorization: `Bearer ${session.access_token}`
           }
@@ -96,7 +101,7 @@ function App() {
     const fetchSubscription = async () => {
       if (!session?.access_token) return;
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/subscription`, {
+        const res = await fetch(`${API_URL}/api/subscription`, {
           headers: {
             Authorization: `Bearer ${session.access_token}`
           }
@@ -129,7 +134,7 @@ function App() {
 
     try {
       setSubscribeStatus('Generando suscripcion...');
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/subscribe`, {
+      const res = await fetch(`${API_URL}/api/subscribe`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -158,7 +163,7 @@ function App() {
     if (!session?.access_token) return;
     setSubscriptionStatus('Procesando...');
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/subscription`, {
+      const res = await fetch(`${API_URL}/api/subscription`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
