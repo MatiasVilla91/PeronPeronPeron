@@ -18,6 +18,7 @@ function App() {
   const [userLoading, setUserLoading] = useState(false);
   const [historyItems, setHistoryItems] = useState([]);
   const [historyLoading, setHistoryLoading] = useState(false);
+  const [historyStatus, setHistoryStatus] = useState('');
   const [subscriptionInfo, setSubscriptionInfo] = useState(null);
   const [subscriptionStatus, setSubscriptionStatus] = useState('');
   const [authOpen, setAuthOpen] = useState(false);
@@ -182,6 +183,35 @@ function App() {
       setSubscriptionStatus('No pudimos actualizar la suscripcion.');
     }
   };
+
+  const handleDeleteHistory = async (id) => {
+    if (!session?.access_token) return;
+    setHistoryStatus('');
+    try {
+      const res = await fetch(`${API_URL}/api/history/${id}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${session.access_token}`
+        }
+      });
+      if (!res.ok) {
+        setHistoryStatus('No pudimos borrar el elemento.');
+        return;
+      }
+      setHistoryItems((prev) => prev.filter((item) => item.id !== id));
+    } catch (error) {
+      setHistoryStatus('No pudimos borrar el elemento.');
+    }
+  };
+
+  const formatHistoryTitle = (text = '') => {
+    const trimmed = String(text).replace(/\s+/g, ' ').trim();
+    if (!trimmed) return 'Nueva conversación';
+    if (trimmed.length <= 60) return trimmed;
+    return `${trimmed.slice(0, 57)}...`;
+  };
+
+  const historyDisplay = historyItems.filter((item) => item.role === 'user');
 
   return (
     <div className="app">
@@ -392,18 +422,26 @@ function App() {
                   <p className="sidebar-title">Historial</p>
                   {historyLoading ? (
                     <p className="sidebar-status">Cargando historial...</p>
-                  ) : historyItems.length ? (
+                  ) : historyDisplay.length ? (
                     <ul className="sidebar-history">
-                      {historyItems.map((item) => (
+                      {historyDisplay.map((item) => (
                         <li key={item.id}>
-                          <span className="history-role">{item.role === 'peron' ? 'Perón' : 'Vos'}</span>
-                          <span className="history-text">{item.text}</span>
+                          <span className="history-title">{formatHistoryTitle(item.text)}</span>
+                          <button
+                            className="history-delete"
+                            type="button"
+                            onClick={() => handleDeleteHistory(item.id)}
+                            aria-label="Eliminar conversación"
+                          >
+                            🗑
+                          </button>
                         </li>
                       ))}
                     </ul>
                   ) : (
                     <p className="sidebar-status">Todavía no hay mensajes.</p>
                   )}
+                  {historyStatus && <p className="sidebar-status">{historyStatus}</p>}
                 </div>
                 <div className="sidebar-block">
                   <p className="sidebar-title">Tu cuenta</p>

@@ -50,4 +50,26 @@ router.get('/', async (req, res) => {
   res.json({ items: data || [] });
 });
 
+router.delete('/:id', async (req, res) => {
+  const authHeader = req.headers.authorization || '';
+  const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
+  const user = await getAuthUser(token);
+  if (!user) return res.status(401).json({ error: 'Unauthorized' });
+
+  const supabaseAuthed = createAuthedClient(token);
+  const { id } = req.params;
+
+  const { error } = await supabaseAuthed
+    .from('chat_history')
+    .delete()
+    .eq('id', id)
+    .eq('user_id', user.id);
+
+  if (error) {
+    return res.status(500).json({ error: 'No se pudo borrar el historial' });
+  }
+
+  return res.json({ ok: true });
+});
+
 module.exports = router;
