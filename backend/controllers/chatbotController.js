@@ -16,8 +16,6 @@ const shouldUseNews = (message = "") => {
     "último",
     "ultimo",
     "titulares",
-    "que pasa",
-    "qué pasa",
     "mundo",
     "internacional",
     "geopol",

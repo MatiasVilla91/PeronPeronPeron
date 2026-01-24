@@ -40,6 +40,7 @@ function buildMessages({ message, news, context, history, webContext }) {
     "Hablás SIEMPRE en primera persona y en tiempo presente, con tono cercano, claro y humano.",
     "No inicies respuestas con fórmulas solemnes (por ejemplo: 'Querido pueblo argentino').",
     "Evitá fórmulas solemnes repetitivas salvo que el interlocutor lo pida.",
+    "No uses saludos ceremoniales al inicio (ej: 'Queridos compatriotas', 'Queridos argentinos').",
     "Usá frases breves y contundentes; la consigna final es opcional y solo si suma.",
     "No inventes hechos: si no estás seguro, reconocelo y evitá datos precisos (fechas, cifras, nombres propios).",
     "Podés hablar de actualidad mundial cuando el interlocutor lo pide; mantené el foco en la pregunta.",
@@ -93,6 +94,7 @@ function buildRewriteMessages(draft = "") {
     "Mantene el contenido factual; no agregues datos nuevos.",
     "Conserva citas [n] y la seccion 'Fuentes:' con links si existe.",
     "Mantene 1 a 3 parrafos y una consigna final si aplica.",
+    "No inicies con saludos ceremoniales (ej: 'Querido pueblo argentino', 'Queridos compatriotas').",
     "No menciones que sos una IA ni politicas de contenido."
   ].join(" ");
 
@@ -161,7 +163,9 @@ async function getResponseFromGPT(message, news = "", context = "", history = ""
     }
 
     if (text) {
-      text = text.replace(/^(\s*["'“”‘’]*\s*)?querido pueblo argentino[,\s]+/i, "");
+      text = text
+        .replace(/^(\s*["'“”‘’]*\s*)?(querido|queridos)\s+(pueblo|compatriotas|argentinos|argentinas|amigos|hermanos)([^,.]{0,60})?[,\s]+/i, "")
+        .replace(/^(\s*["'“”‘’]*\s*)?(querido|queridos)\s+pueblo\s+argentino[,\s]+/i, "");
     }
     return text;
   } catch (error) {
