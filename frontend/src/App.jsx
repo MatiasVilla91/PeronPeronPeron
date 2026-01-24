@@ -325,31 +325,6 @@ function App() {
                   Nueva conversación
                 </button>
                 <div className="sidebar-block">
-                  <p className="sidebar-title">Historial</p>
-                  {historyLoading ? (
-                    <p className="sidebar-status">Cargando historial...</p>
-                  ) : historyDisplay.length ? (
-                    <ul className="sidebar-history">
-                      {historyDisplay.map((item) => (
-                        <li key={item.id}>
-                          <span className="history-title">{formatHistoryTitle(item.text)}</span>
-                          <button
-                            className="history-delete"
-                            type="button"
-                            onClick={() => handleDeleteHistory(item.id)}
-                            aria-label="Eliminar conversación"
-                          >
-                            🗑
-                          </button>
-                        </li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <p className="sidebar-status">Todavía no hay mensajes.</p>
-                  )}
-                  {historyStatus && <p className="sidebar-status">{historyStatus}</p>}
-                </div>
-                <div className="sidebar-block">
                   <p className="sidebar-title">Tu cuenta</p>
                   {session ? (
                     <>
@@ -409,6 +384,31 @@ function App() {
                       </button>
                     </div>
                   )}
+                </div>
+                <div className="sidebar-block">
+                  <p className="sidebar-title">Historial</p>
+                  {historyLoading ? (
+                    <p className="sidebar-status">Cargando historial...</p>
+                  ) : historyDisplay.length ? (
+                    <ul className="sidebar-history">
+                      {historyDisplay.map((item) => (
+                        <li key={item.id}>
+                          <span className="history-title">{formatHistoryTitle(item.text)}</span>
+                          <button
+                            className="history-delete"
+                            type="button"
+                            onClick={() => handleDeleteHistory(item.id)}
+                            aria-label="Eliminar conversación"
+                          >
+                            🗑
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="sidebar-status">Todavía no hay mensajes.</p>
+                  )}
+                  {historyStatus && <p className="sidebar-status">{historyStatus}</p>}
                 </div>
               </aside>
               <div className="chat-shell">
