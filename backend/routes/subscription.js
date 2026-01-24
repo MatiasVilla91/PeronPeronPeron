@@ -75,6 +75,12 @@ router.get('/', async (req, res) => {
 
   try {
     const subscription = await fetchSubscription(profile.mp_subscription_id);
+    const isActive = subscription.status === 'authorized' || subscription.status === 'active';
+    await supabaseAuthed.from('profiles').upsert({
+      id: user.id,
+      plan: isActive ? 'pro' : 'free',
+      mp_status: subscription.status
+    });
     res.json({
       hasSubscription: true,
       id: subscription.id,

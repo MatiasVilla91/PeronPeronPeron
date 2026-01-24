@@ -86,7 +86,7 @@ router.post('/', async (req, res) => {
 
     const { data: profile } = await supabaseAuthed
       .from('profiles')
-      .select('plan')
+      .select('plan, mp_status')
       .eq('id', user.id)
       .single();
 
@@ -97,7 +97,15 @@ router.post('/', async (req, res) => {
       });
     }
 
+    const isActiveSub = ['authorized', 'active'].includes(profile?.mp_status);
     plan = profile?.plan || 'free';
+    if (isActiveSub && plan !== 'pro') {
+      plan = 'pro';
+      await supabaseAuthed.from('profiles').upsert({
+        id: user.id,
+        plan: 'pro'
+      });
+    }
 
     const { data: usage } = await supabaseAuthed
       .from('usage_daily')
