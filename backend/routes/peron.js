@@ -6,7 +6,8 @@ const router = express.Router();
 
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
-const dailyLimit = Number(process.env.FREE_DAILY_LIMIT || 3);
+const dailyLimitAnon = Number(process.env.FREE_DAILY_LIMIT_ANON || 3);
+const dailyLimitAuth = Number(process.env.FREE_DAILY_LIMIT_AUTH || 5);
 const maxInputChars = Number(process.env.MAX_INPUT_CHARS || 800);
 const historyLimit = Number(process.env.HISTORY_LIMIT || 8);
 const maxHistoryChars = Number(process.env.MAX_HISTORY_CHARS || 1600);
@@ -118,12 +119,17 @@ router.post('/', async (req, res) => {
   } else {
     const key = `${clientIp}:${today}`;
     currentCount = anonUsage.get(key) || 0;
-    if (currentCount >= dailyLimit) {
+    if (currentCount >= dailyLimitAnon) {
       return res.status(429).json({ error: 'Daily limit reached' });
     }
   }
 
-  if (plan !== 'pro' && currentCount >= dailyLimit) {
+  if (plan !== 'pro') {
+    const limit = token ? dailyLimitAuth : dailyLimitAnon;
+    if (currentCount >= limit) {
+      return res.status(429).json({ error: 'Daily limit reached' });
+    }
+  }
     return res.status(429).json({ error: 'Daily limit reached' });
   }
 

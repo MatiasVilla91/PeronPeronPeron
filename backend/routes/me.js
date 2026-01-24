@@ -5,7 +5,7 @@ const router = express.Router();
 
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
-const dailyLimit = Number(process.env.FREE_DAILY_LIMIT || 3);
+const dailyLimitAuth = Number(process.env.FREE_DAILY_LIMIT_AUTH || 5);
 
 if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error('Missing SUPABASE_URL or SUPABASE_ANON_KEY');
@@ -72,7 +72,7 @@ router.get('/', async (req, res) => {
     email: user.email,
     plan,
     isPro: plan === 'pro',
-    dailyLimit,
+    dailyLimit: plan === 'pro' ? null : dailyLimitAuth,
     dailyCount: usage?.count || 0,
     date: today
   });
