@@ -23,7 +23,8 @@ const AuthPanel = ({ onAuth }) => {
     });
     setLoading(false);
     if (error) {
-      setStatus('No pudimos iniciar sesión. Verificá tus datos.');
+      console.error('Login error:', error);
+      setStatus(error.message || 'No pudimos iniciar sesión. Verificá tus datos.');
       return;
     }
     onAuth?.(data.session);
@@ -44,7 +45,8 @@ const AuthPanel = ({ onAuth }) => {
     });
     setLoading(false);
     if (error) {
-      setStatus('No pudimos crear la cuenta. Probá con otro correo.');
+      console.error('Signup error:', error);
+      setStatus(error.message || 'No pudimos crear la cuenta. Probá con otro correo.');
       return;
     }
     if (!data.session) {
@@ -66,7 +68,8 @@ const AuthPanel = ({ onAuth }) => {
     const { error } = await supabase.auth.resetPasswordForEmail(email);
     setLoading(false);
     if (error) {
-      setStatus('No pudimos enviar el correo de recuperación.');
+      console.error('Reset error:', error);
+      setStatus(error.message || 'No pudimos enviar el correo de recuperación.');
       return;
     }
     setStatus('Te enviamos un correo para recuperar la cuenta.');
