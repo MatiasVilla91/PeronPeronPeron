@@ -225,9 +225,6 @@ function App() {
             </div>
           </div>
           <nav className="nav">
-            <a href="#contexto">Contexto</a>
-            <a href="#propuesta">Propuesta</a>
-            <a href="#impacto">Impacto</a>
             <a href="#chat">Chat</a>
           </nav>
           <div className="header-actions">
@@ -304,97 +301,6 @@ function App() {
                 <span className="pill">Identidad</span>
                 <span className="pill">Cercanía</span>
                 <span className="pill">Futuro</span>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section id="contexto" className="section story">
-          <div className="container section-grid">
-            <div>
-              <p className="section-eyebrow">Contexto</p>
-              <h2>Una IA con memoria historica.</h2>
-              <p className="section-lead">
-                No es un chatbot cualquiera. Es una reconstruccion de voz y pensamiento,
-                entrenada con fuentes reales para hablar como Peron.
-              </p>
-            </div>
-            
-            <div className="story-cards">
-              <div className="story-card">
-                <span className="story-tag">01</span>
-                <h3>Entrenamiento real</h3>
-                <p>Discursos, documentos y cartas autenticas.</p>
-              </div>
-              <div className="story-card">
-                <span className="story-tag">02</span>
-                <h3>Voz coherente</h3>
-                <p>Responde con el estilo y el lenguaje de la epoca.</p>
-              </div>
-              <div className="story-card">
-                <span className="story-tag">03</span>
-                <h3>Uso ciudadano</h3>
-                <p>Pensada para dialogar, aprender y debatir con identidad.</p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section id="propuesta" className="section alt">
-          <div className="container">
-            <div className="section-header">
-              <p className="section-eyebrow">Propuesta</p>
-              <h2>Una experiencia unica, con rigor historico.</h2>
-              <p className="section-lead">
-                Un asistente entrenado para hablar como Peron, con datos reales y una voz reconocible.
-              </p>
-            </div>
-            
-            <div className="program-grid">
-              <article className="program-card">
-                <div className="program-icon">>>></div>
-                <h3>Entrenamiento historico</h3>
-                <p>Base documental curada para mayor fidelidad.</p>
-                <span className="program-tag">Claro</span>
-              </article>
-              <article className="program-card">
-                <div className="program-icon">>>></div>
-                <h3>Respuesta en personaje</h3>
-                <p>Tono y estilo consistentes en cada respuesta.</p>
-                <span className="program-tag">Confianza</span>
-              </article>
-              <article className="program-card">
-                <div className="program-icon">>>></div>
-                <h3>Acceso simple</h3>
-                <p>Entras, preguntas, y conversas al instante.</p>
-                <span className="program-tag">Accion</span>
-              </article>
-            </div>
-          </div>
-        </section>
-
-        <section id="impacto" className="section">
-          <div className="container section-grid">
-            <div>
-              <p className="section-eyebrow">Impacto</p>
-              <h2>Una forma nueva de aprender historia.</h2>
-              <p className="section-lead">
-                Mas cercano, mas directo y mas nuestro.
-              </p>
-            </div>
-            
-            <div className="impact-grid">
-              <div className="impact-card">
-                <p className="impact-number">+68%</p>
-                <p className="impact-label">Conversacion mas clara</p>
-              </div>
-              <div className="impact-card">
-                <p className="impact-number">3x</p>
-                <p className="impact-label">Mas participacion</p>
-              </div>
-              <div className="impact-card">
-                <p className="impact-number">24h</p>
-                <p className="impact-label">Acceso inmediato</p>
               </div>
             </div>
           </div>
@@ -504,23 +410,6 @@ function App() {
                     </div>
                   )}
                 </div>
-                <div className="sidebar-block">
-                  <p className="sidebar-title">Planes</p>
-                  <div className="plan-card">
-                    <p className="plan-title">Plan Gratis</p>
-                    <p className="plan-price">$0</p>
-                    <p className="plan-detail">3 preguntas por dia - Acceso inmediato</p>
-                  </div>
-                  <div className="plan-card pro">
-                    <p className="plan-title">Plan Pro</p>
-                    <p className="plan-price">$7.500 ARS / mes</p>
-                    <p className="plan-detail">Ilimitado - Historial - Prioridad</p>
-                    <button className="cta pro-cta" type="button" onClick={handleSubscribe}>
-                      Quiero Pro
-                    </button>
-                    {subscribeStatus && <p className="plan-status">{subscribeStatus}</p>}
-                  </div>
-                </div>
               </aside>
               <div className="chat-shell">
                 {!supabaseReady ? (
@@ -539,6 +428,127 @@ function App() {
             </div>
           </div>
         </section>
+
+        <section id="contexto" className="section story">
+          <div className="container section-grid">
+            <div>
+              <p className="section-eyebrow">Contexto</p>
+              <h2>Una IA con memoria historica.</h2>
+              <p className="section-lead">
+                No es un chatbot cualquiera. Es una reconstruccion de voz y pensamiento,
+                entrenada con fuentes reales para hablar como Peron.
+              </p>
+            </div>
+            
+            <div className="story-cards">
+              <div className="story-card">
+                <span className="story-tag">01</span>
+                <h3>Entrenamiento real</h3>
+                <p>Discursos, documentos y cartas autenticas.</p>
+              </div>
+              <div className="story-card">
+                <span className="story-tag">02</span>
+                <h3>Voz coherente</h3>
+                <p>Responde con el estilo y el lenguaje de la epoca.</p>
+              </div>
+              <div className="story-card">
+                <span className="story-tag">03</span>
+                <h3>Uso ciudadano</h3>
+                <p>Pensada para dialogar, aprender y debatir con identidad.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="propuesta" className="section alt">
+          <div className="container">
+            <div className="section-header">
+              <p className="section-eyebrow">Propuesta</p>
+              <h2>Una experiencia unica, con rigor historico.</h2>
+              <p className="section-lead">
+                Un asistente entrenado para hablar como Peron, con datos reales y una voz reconocible.
+              </p>
+            </div>
+            
+            <div className="program-grid">
+              <article className="program-card">
+                <div className="program-icon">>>></div>
+                <h3>Entrenamiento historico</h3>
+                <p>Base documental curada para mayor fidelidad.</p>
+                <span className="program-tag">Claro</span>
+              </article>
+              <article className="program-card">
+                <div className="program-icon">>>></div>
+                <h3>Respuesta en personaje</h3>
+                <p>Tono y estilo consistentes en cada respuesta.</p>
+                <span className="program-tag">Confianza</span>
+              </article>
+              <article className="program-card">
+                <div className="program-icon">>>></div>
+                <h3>Acceso simple</h3>
+                <p>Entras, preguntas, y conversas al instante.</p>
+                <span className="program-tag">Accion</span>
+              </article>
+            </div>
+          </div>
+        </section>
+
+        <section id="impacto" className="section">
+          <div className="container section-grid">
+            <div>
+              <p className="section-eyebrow">Impacto</p>
+              <h2>Una forma nueva de aprender historia.</h2>
+              <p className="section-lead">
+                Mas cercano, mas directo y mas nuestro.
+              </p>
+            </div>
+            
+            <div className="impact-grid">
+              <div className="impact-card">
+                <p className="impact-number">+68%</p>
+                <p className="impact-label">Conversacion mas clara</p>
+              </div>
+              <div className="impact-card">
+                <p className="impact-number">3x</p>
+                <p className="impact-label">Mas participacion</p>
+              </div>
+              <div className="impact-card">
+                <p className="impact-number">24h</p>
+                <p className="impact-label">Acceso inmediato</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="planes" className="section alt">
+          <div className="container">
+            <div className="section-header">
+              <p className="section-eyebrow">Planes</p>
+              <h2>Elegi tu forma de participar.</h2>
+              <p className="section-lead">
+                Acceso inmediato con el plan gratis o desbloquea historial completo con Pro.
+              </p>
+            </div>
+            <div className="program-grid">
+              <div className="plan-card">
+                <p className="plan-title">Plan Gratis</p>
+                <p className="plan-price">$0</p>
+                <p className="plan-detail">3 preguntas por dia - Acceso inmediato</p>
+              </div>
+              <div className="plan-card pro">
+                <p className="plan-title">Plan Pro</p>
+                <p className="plan-price">$7.500 ARS / mes</p>
+                <p className="plan-detail">Ilimitado - Historial - Prioridad</p>
+                <button className="cta pro-cta" type="button" onClick={handleSubscribe}>
+                  Quiero Pro
+                </button>
+                {subscribeStatus && <p className="plan-status">{subscribeStatus}</p>}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        
       </main>
 
       {authOpen && !session && (
@@ -574,6 +584,7 @@ function App() {
             <a href="#propuesta">Propuesta</a>
             <a href="#impacto">Impacto</a>
             <a href="#chat">Chat</a>
+            <a href="#planes">Planes</a>
           </div>
         </div>
       </footer>
@@ -582,3 +593,4 @@ function App() {
 }
 
 export default App;
+
