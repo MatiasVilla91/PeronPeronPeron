@@ -383,59 +383,40 @@ function App() {
                 <strong>Estilo autentico y documentado</strong>
               </div>
             </div>
-            <div className="chat-shell">
-              {!supabaseReady ? (
-                <div className="auth-panel">
-                  <div className="auth-header">
-                    <h3>Configuración pendiente</h3>
-                    <p>Faltan variables de entorno de Supabase en Netlify.</p>
-                  </div>
+            <div className="chat-layout">
+              <aside className="chat-sidebar">
+                <button className="new-chat" type="button">
+                  Nueva conversación
+                </button>
+                <div className="sidebar-block">
+                  <p className="sidebar-title">Historial</p>
+                  {historyLoading ? (
+                    <p className="sidebar-status">Cargando historial...</p>
+                  ) : historyItems.length ? (
+                    <ul className="sidebar-history">
+                      {historyItems.map((item) => (
+                        <li key={item.id}>
+                          <span className="history-role">{item.role === 'peron' ? 'Perón' : 'Vos'}</span>
+                          <span className="history-text">{item.text}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="sidebar-status">Todavía no hay mensajes.</p>
+                  )}
                 </div>
-              ) : isRecovery ? (
-                <ResetPasswordPanel />
-              ) : (
-                <>
-                  <ChatBot accessToken={session?.access_token} />
-                  <div className="chat-actions">
-                    <div className="plan-card">
-                      <p className="plan-title">Plan Gratis</p>
-                      <p className="plan-price">$0</p>
-                      <p className="plan-detail">3 preguntas por dia - Acceso inmediato</p>
-                    </div>
-                    <div className="plan-card pro">
-                      <p className="plan-title">Plan Pro</p>
-                      <p className="plan-price">$7.500 ARS / mes</p>
-                      <p className="plan-detail">Ilimitado - Historial - Prioridad</p>
-                      <button className="cta pro-cta" type="button" onClick={handleSubscribe}>
-                        Quiero Pro
-                      </button>
-                      {subscribeStatus && <p className="plan-status">{subscribeStatus}</p>}
-                    </div>
-                    {!session && (
-                      <div className="access-card">
-                        <p className="access-title">Accede a tu cuenta</p>
-                        <p className="access-text">Guarda tu historial y desbloquea el plan Pro.</p>
-                        <button className="cta" type="button" onClick={() => setAuthOpen(true)}>
-                          Iniciar sesion
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                  {session && (
-                    <div className="user-panel">
-                      <div className="user-panel-header">
-                        <div>
-                          <p className="user-panel-title">Tu cuenta</p>
-                          <p className="user-panel-email">{userInfo?.email || 'Cuenta activa'}</p>
-                        </div>
-                        <span className={`user-plan ${userInfo?.isPro ? 'pro' : 'free'}`}>
-                          {userInfo?.isPro ? 'Pro' : 'Gratis'}
-                        </span>
-                      </div>
+                <div className="sidebar-block">
+                  <p className="sidebar-title">Tu cuenta</p>
+                  {session ? (
+                    <>
+                      <p className="sidebar-email">{userInfo?.email || 'Cuenta activa'}</p>
+                      <span className={`user-plan ${userInfo?.isPro ? 'pro' : 'free'}`}>
+                        {userInfo?.isPro ? 'Pro' : 'Gratis'}
+                      </span>
                       {userLoading ? (
-                        <p className="user-panel-status">Actualizando datos...</p>
+                        <p className="sidebar-status">Actualizando datos...</p>
                       ) : userInfo ? (
-                        <div className="user-panel-grid">
+                        <div className="sidebar-metrics">
                           <div>
                             <p className="user-panel-label">Límite diario</p>
                             <p className="user-panel-value">{userInfo.dailyLimit}</p>
@@ -450,9 +431,9 @@ function App() {
                           </div>
                         </div>
                       ) : (
-                        <p className="user-panel-status">No pudimos cargar tus datos.</p>
+                        <p className="sidebar-status">No pudimos cargar tus datos.</p>
                       )}
-                      <div className="user-panel-actions">
+                      <div className="sidebar-actions">
                         {subscriptionInfo?.hasSubscription ? (
                           <>
                             <button className="ghost small" type="button" onClick={() => handleSubscriptionAction('pause')}>
@@ -474,27 +455,49 @@ function App() {
                           <p className="user-panel-status">{subscriptionStatus}</p>
                         )}
                       </div>
-                      <div className="user-panel-history">
-                        <p className="user-panel-label">Historial reciente</p>
-                        {historyLoading ? (
-                          <p className="user-panel-status">Cargando historial...</p>
-                        ) : historyItems.length ? (
-                          <ul className="history-list">
-                            {historyItems.map((item) => (
-                              <li key={item.id}>
-                                <span className="history-role">{item.role === 'peron' ? 'Perón' : 'Vos'}</span>
-                                <span className="history-text">{item.text}</span>
-                              </li>
-                            ))}
-                          </ul>
-                        ) : (
-                          <p className="user-panel-status">Todavía no hay mensajes guardados.</p>
-                        )}
-                      </div>
+                    </>
+                  ) : (
+                    <div className="access-card">
+                      <p className="access-title">Accede a tu cuenta</p>
+                      <p className="access-text">Guarda tu historial y desbloquea el plan Pro.</p>
+                      <button className="cta" type="button" onClick={() => setAuthOpen(true)}>
+                        Iniciar sesion
+                      </button>
                     </div>
                   )}
-                </>
-              )}
+                </div>
+                <div className="sidebar-block">
+                  <p className="sidebar-title">Planes</p>
+                  <div className="plan-card">
+                    <p className="plan-title">Plan Gratis</p>
+                    <p className="plan-price">$0</p>
+                    <p className="plan-detail">3 preguntas por dia - Acceso inmediato</p>
+                  </div>
+                  <div className="plan-card pro">
+                    <p className="plan-title">Plan Pro</p>
+                    <p className="plan-price">$7.500 ARS / mes</p>
+                    <p className="plan-detail">Ilimitado - Historial - Prioridad</p>
+                    <button className="cta pro-cta" type="button" onClick={handleSubscribe}>
+                      Quiero Pro
+                    </button>
+                    {subscribeStatus && <p className="plan-status">{subscribeStatus}</p>}
+                  </div>
+                </div>
+              </aside>
+              <div className="chat-shell">
+                {!supabaseReady ? (
+                  <div className="auth-panel">
+                    <div className="auth-header">
+                      <h3>Configuración pendiente</h3>
+                      <p>Faltan variables de entorno de Supabase en Netlify.</p>
+                    </div>
+                  </div>
+                ) : isRecovery ? (
+                  <ResetPasswordPanel />
+                ) : (
+                  <ChatBot accessToken={session?.access_token} />
+                )}
+              </div>
             </div>
           </div>
         </section>
