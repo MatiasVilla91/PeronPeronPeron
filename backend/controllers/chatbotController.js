@@ -17,7 +17,11 @@ const shouldUseNews = (message = "") => {
     "ultimo",
     "titulares",
     "que pasa",
-    "qué pasa"
+    "qué pasa",
+    "mundo",
+    "internacional",
+    "geopol",
+    "geopolítica"
   ];
   return triggers.some((t) => text.includes(t));
 };
