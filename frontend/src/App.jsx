@@ -371,7 +371,7 @@ function App() {
         </section>
 
         <section id="chat" className="section chat-section">
-          <div className="container chat-grid">
+          <div className="container chat-stack">
             <div className="chat-intro">
               <p className="section-eyebrow">Chat ciudadano</p>
               <h2>Proba ahora.</h2>
@@ -382,29 +382,6 @@ function App() {
                 <span>Respuestas con fuentes</span>
                 <strong>Estilo autentico y documentado</strong>
               </div>
-              <div className="plan-card">
-                <p className="plan-title">Plan Gratis</p>
-                <p className="plan-price">$0</p>
-                <p className="plan-detail">3 preguntas por dia - Acceso inmediato</p>
-              </div>
-              <div className="plan-card pro">
-                <p className="plan-title">Plan Pro</p>
-                <p className="plan-price">$7.500 ARS / mes</p>
-                <p className="plan-detail">Ilimitado - Historial - Prioridad</p>
-                <button className="cta pro-cta" type="button" onClick={handleSubscribe}>
-                  Quiero Pro
-                </button>
-                {subscribeStatus && <p className="plan-status">{subscribeStatus}</p>}
-              </div>
-              {!session && (
-                <div className="access-card">
-                  <p className="access-title">Accede a tu cuenta</p>
-                  <p className="access-text">Guarda tu historial y desbloquea el plan Pro.</p>
-                  <button className="cta" type="button" onClick={() => setAuthOpen(true)}>
-                    Iniciar sesion
-                  </button>
-                </div>
-              )}
             </div>
             <div className="chat-shell">
               {!supabaseReady ? (
@@ -419,6 +396,31 @@ function App() {
               ) : (
                 <>
                   <ChatBot accessToken={session?.access_token} />
+                  <div className="chat-actions">
+                    <div className="plan-card">
+                      <p className="plan-title">Plan Gratis</p>
+                      <p className="plan-price">$0</p>
+                      <p className="plan-detail">3 preguntas por dia - Acceso inmediato</p>
+                    </div>
+                    <div className="plan-card pro">
+                      <p className="plan-title">Plan Pro</p>
+                      <p className="plan-price">$7.500 ARS / mes</p>
+                      <p className="plan-detail">Ilimitado - Historial - Prioridad</p>
+                      <button className="cta pro-cta" type="button" onClick={handleSubscribe}>
+                        Quiero Pro
+                      </button>
+                      {subscribeStatus && <p className="plan-status">{subscribeStatus}</p>}
+                    </div>
+                    {!session && (
+                      <div className="access-card">
+                        <p className="access-title">Accede a tu cuenta</p>
+                        <p className="access-text">Guarda tu historial y desbloquea el plan Pro.</p>
+                        <button className="cta" type="button" onClick={() => setAuthOpen(true)}>
+                          Iniciar sesion
+                        </button>
+                      </div>
+                    )}
+                  </div>
                   {session && (
                     <div className="user-panel">
                       <div className="user-panel-header">
