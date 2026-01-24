@@ -57,9 +57,8 @@ const truncate = (text = "", maxChars = 1600) => {
 const formatHistory = (items = []) => {
   if (!items.length) return "";
   const lines = items.map((item) => {
-    const role = item.role === "peron" ? "Peron" : "Usuario";
     const text = String(item.text || "").replace(/\s+/g, " ").trim();
-    return `${role}: ${text}`;
+    return `Usuario: ${text}`;
   });
   return truncate(lines.join("\n"), maxHistoryChars);
 };
@@ -148,7 +147,14 @@ router.post('/', async (req, res) => {
         .limit(historyLimit);
 
       if (historyItems && historyItems.length) {
-        historyText = formatHistory(historyItems.slice().reverse());
+        const userOnly = historyItems
+          .filter((item) => item.role === 'user')
+          .slice(0, historyLimit)
+          .slice()
+          .reverse();
+        if (userOnly.length) {
+          historyText = formatHistory(userOnly);
+        }
       }
     }
 
