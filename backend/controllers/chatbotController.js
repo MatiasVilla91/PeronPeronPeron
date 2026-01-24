@@ -6,22 +6,11 @@ const { getWebContext } = require("../services/webSearchService");
 
 const shouldUseNews = (message = "") => {
   const text = message.toLowerCase();
-  const triggers = [
-    "noticia",
-    "noticias",
-    "hoy",
-    "actual",
-    "ahora",
-    "reciente",
-    "último",
-    "ultimo",
-    "titulares",
-    "mundo",
-    "internacional",
-    "geopol",
-    "geopolítica"
-  ];
-  return triggers.some((t) => text.includes(t));
+  return (
+    text.includes("noticia") ||
+    text.includes("noticias") ||
+    text.includes("actualidad")
+  );
 };
 
 async function getPeronResponse(message, history = "") {
@@ -33,7 +22,7 @@ async function getPeronResponse(message, history = "") {
     const noticias = shouldUseNews(message) ? await getLatestNews() : "";
 
     // 3) Contexto web (opcionales, con fuentes)
-    const webContext = await getWebContext(message);
+    const webContext = shouldUseNews(message) ? await getWebContext(message) : "";
 
     // 4) Respuesta final (usa ambos)
     const gptResponse = await getResponseFromGPT(message, noticias, context, history, webContext);

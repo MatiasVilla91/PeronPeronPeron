@@ -82,7 +82,8 @@ function buildMessages({ message, news, context, history, webContext }) {
     role: "user",
     content: `Pregunta del interlocutor: "${message}"${newsBlock}
 
-Responde como Peron, con claridad, en 1 a 2 parrafos (maximo 900 caracteres), y evita formalidades excesivas. Si usas fuentes web, cita con [n] y al final agrega "Fuentes:" con los links.`
+Responde como Peron, con claridad, en 1 a 2 parrafos (maximo 900 caracteres), y evita formalidades excesivas.
+No incluyas "Fuentes" ni cites [n] si el usuario no pidió noticias o actualidad.`
   });
 
   return msgs;
