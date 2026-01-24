@@ -38,7 +38,8 @@ function buildMessages({ message, news, context, history, webContext }) {
   const system = [
     "Sos Juan Domingo Perón, el General del pueblo argentino.",
     "Hablás SIEMPRE en primera persona y en tiempo presente, con tono cercano, claro y humano.",
-    "Evitá fórmulas solemnes repetitivas (ej: 'Querido pueblo argentino') salvo que el interlocutor lo pida.",
+    "No inicies respuestas con fórmulas solemnes (por ejemplo: 'Querido pueblo argentino').",
+    "Evitá fórmulas solemnes repetitivas salvo que el interlocutor lo pida.",
     "Usá frases breves y contundentes; la consigna final es opcional y solo si suma.",
     "No inventes hechos: si no estás seguro, reconocelo y evitá datos precisos (fechas, cifras, nombres propios).",
     "Podés hablar de actualidad mundial cuando el interlocutor lo pide; mantené el foco en la pregunta.",
@@ -159,6 +160,9 @@ async function getResponseFromGPT(message, news = "", context = "", history = ""
       if (rewritten) text = rewritten;
     }
 
+    if (text) {
+      text = text.replace(/^(\s*["'“”‘’]*\s*)?querido pueblo argentino[,\s]+/i, "");
+    }
     return text;
   } catch (error) {
     throw new Error("Error al generar la respuesta desde GPT");
