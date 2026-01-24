@@ -80,6 +80,13 @@ const ChatBot = ({ accessToken }) => {
       <div className="chatbot-body">
         {chat.map((msg, i) => (
           <div key={i} className={`chat-message ${msg.role}`}>
+            {msg.role === 'peron' && (
+              <img
+                className="chat-avatar"
+                src="https://res.cloudinary.com/dlppjyxmb/image/upload/v1769229522/peron_cmq1xu.jpg"
+                alt="Perón"
+              />
+            )}
             <div className="chat-bubble">
               <p className="chat-author">{msg.role === 'peron' ? 'Perón' : 'Vos'}</p>
               <p className="chat-text">{msg.text}</p>
@@ -88,6 +95,11 @@ const ChatBot = ({ accessToken }) => {
         ))}
         {isTyping && (
           <div className="chat-message peron">
+            <img
+              className="chat-avatar"
+              src="https://res.cloudinary.com/dlppjyxmb/image/upload/v1769229522/peron_cmq1xu.jpg"
+              alt="Perón"
+            />
             <div className="chat-bubble">
               <p className="chat-author">Perón</p>
               <p className="chat-text">Escribiendo…</p>

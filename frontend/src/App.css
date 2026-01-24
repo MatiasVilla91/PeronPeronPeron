@@ -703,10 +703,21 @@
 
 .chat-message {
   display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
 }
 
 .chat-message.user {
   justify-content: flex-end;
+}
+
+.chat-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(12, 90, 166, 0.2);
+  flex-shrink: 0;
 }
 
 .chat-bubble {
