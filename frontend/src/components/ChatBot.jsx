@@ -12,6 +12,64 @@ const ChatBot = ({ accessToken }) => {
   ]);
   const [isTyping, setIsTyping] = useState(false);
 
+  const stripSourcesLabel = (text = '') => {
+    return String(text)
+      .split('\n')
+      .filter((line) => !/^fuentes\s*:/i.test(line.trim()))
+      .join('\n')
+      .trim();
+  };
+
+  const renderChatText = (rawText = '') => {
+    const text = stripSourcesLabel(rawText);
+    const regex = /\[(\d+)\]\((https?:\/\/[^\s)]+)\)/g;
+    const nodes = [];
+    let lastIndex = 0;
+    let match;
+
+    while ((match = regex.exec(text)) !== null) {
+      const [full, num, url] = match;
+      const index = match.index;
+      const before = text.slice(lastIndex, index);
+      if (before) nodes.push(before);
+      nodes.push({ type: 'citation', num, url, key: `${index}-${num}` });
+      lastIndex = index + full.length;
+    }
+
+    const tail = text.slice(lastIndex);
+    if (tail) nodes.push(tail);
+
+    const withBreaks = [];
+    nodes.forEach((node, idx) => {
+      if (typeof node === 'string') {
+        const parts = node.split('\n');
+        parts.forEach((part, partIdx) => {
+          if (part) withBreaks.push(part);
+          if (partIdx < parts.length - 1) {
+            withBreaks.push({ type: 'br', key: `br-${idx}-${partIdx}` });
+          }
+        });
+      } else {
+        withBreaks.push(node);
+      }
+    });
+
+    return withBreaks.map((node, idx) => {
+      if (typeof node === 'string') return node;
+      if (node.type === 'br') return <br key={node.key || `br-${idx}`} />;
+      return (
+        <span
+          key={node.key || `cit-${idx}`}
+          className="citation"
+          title={node.url}
+          aria-label={`Fuente ${node.num}`}
+        >
+          i
+        </span>
+      );
+    });
+  };
+
   const enviarMensaje = async () => {
     if (!input.trim()) return;
 
@@ -89,7 +147,7 @@ const ChatBot = ({ accessToken }) => {
             )}
             <div className="chat-bubble">
               <p className="chat-author">{msg.role === 'peron' ? 'Perón' : 'Vos'}</p>
-              <p className="chat-text">{msg.text}</p>
+              <p className="chat-text">{renderChatText(msg.text)}</p>
             </div>
           </div>
         ))}

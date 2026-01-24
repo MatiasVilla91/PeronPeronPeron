@@ -748,6 +748,28 @@
   line-height: 1.5;
 }
 
+.citation {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  margin-left: 0.3rem;
+  border-radius: 999px;
+  border: 1px solid rgba(12, 90, 166, 0.35);
+  background: rgba(12, 90, 166, 0.08);
+  color: var(--ink-700);
+  font-size: 0.7rem;
+  font-weight: 700;
+  cursor: help;
+  vertical-align: text-top;
+}
+
+.citation:hover {
+  background: rgba(12, 90, 166, 0.18);
+  color: var(--ink-900);
+}
+
 .audio-button {
   justify-self: start;
   border: none;
