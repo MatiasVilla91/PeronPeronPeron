@@ -107,6 +107,29 @@ ${truncate(draft, 2400)}` }
   ];
 }
 
+function extractSources(webContext = "") {
+  const map = new Map();
+  if (!webContext) return map;
+  const lines = String(webContext).split("\n");
+  for (const line of lines) {
+    const match = line.match(/^\[(\d+)\]\s.+\((https?:\/\/[^)]+)\)\s*$/);
+    if (match) {
+      map.set(match[1], match[2]);
+    }
+  }
+  return map;
+}
+
+function linkifySources(text = "", webContext = "") {
+  const sources = extractSources(webContext);
+  if (!text || !sources.size) return text;
+  return text.replace(/\[(\d+)\]/g, (full, num) => {
+    const url = sources.get(num);
+    if (!url) return full;
+    return `[${num}](${url})`;
+  });
+}
+
 /**
  * Llama a OpenAI con reintentos y backoff exponencial.
  */
@@ -177,6 +200,9 @@ async function getResponseFromGPT(message, news = "", context = "", history = ""
       } else {
         text = truncate(text, 1200);
       }
+    }
+    if (text && webContext) {
+      text = linkifySources(text, webContext);
     }
     return text;
   } catch (error) {
