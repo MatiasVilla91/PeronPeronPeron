@@ -4,13 +4,31 @@ const { getRelevantContext } = require("./trainController");
 const { getLatestNews } = require("../services/newsService");
 const { getWebContext } = require("../services/webSearchService");
 
+const shouldUseNews = (message = "") => {
+  const text = message.toLowerCase();
+  const triggers = [
+    "noticia",
+    "noticias",
+    "hoy",
+    "actual",
+    "ahora",
+    "reciente",
+    "último",
+    "ultimo",
+    "titulares",
+    "que pasa",
+    "qué pasa"
+  ];
+  return triggers.some((t) => text.includes(t));
+};
+
 async function getPeronResponse(message, history = "") {
   try {
     // 1) Traer fragmentos de discursos relacionados
     const context = await getRelevantContext(message);
 
     // 2) Noticias (opcionales)
-    const noticias = await getLatestNews();
+    const noticias = shouldUseNews(message) ? await getLatestNews() : "";
 
     // 3) Contexto web (opcionales, con fuentes)
     const webContext = await getWebContext(message);

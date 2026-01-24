@@ -6,6 +6,7 @@ const router = express.Router();
 
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const dailyLimitAnon = Number(process.env.FREE_DAILY_LIMIT_ANON || 3);
 const dailyLimitAuth = Number(process.env.FREE_DAILY_LIMIT_AUTH || 5);
 const maxInputChars = Number(process.env.MAX_INPUT_CHARS || 800);
@@ -18,6 +19,7 @@ if (!supabaseUrl || !supabaseAnonKey) {
 }
 
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
+const supabaseAdmin = supabaseServiceKey ? createClient(supabaseUrl, supabaseServiceKey) : null;
 
 const getAuthUser = async (token) => {
   if (!token) return null;
@@ -85,14 +87,15 @@ router.post('/', async (req, res) => {
     if (!user) return res.status(401).json({ error: 'Unauthorized' });
     supabaseAuthed = createAuthedClient(token);
 
-    const { data: profile } = await supabaseAuthed
+    const profileClient = supabaseAdmin || supabaseAuthed;
+    const { data: profile } = await profileClient
       .from('profiles')
       .select('plan, mp_status')
       .eq('id', user.id)
       .single();
 
     if (!profile) {
-      await supabaseAuthed.from('profiles').upsert({
+      await profileClient.from('profiles').upsert({
         id: user.id,
         plan: 'free'
       });
@@ -102,13 +105,14 @@ router.post('/', async (req, res) => {
     plan = profile?.plan || 'free';
     if (isActiveSub && plan !== 'pro') {
       plan = 'pro';
-      await supabaseAuthed.from('profiles').upsert({
+      await profileClient.from('profiles').upsert({
         id: user.id,
         plan: 'pro'
       });
     }
 
-    const { data: usage } = await supabaseAuthed
+    const usageClient = supabaseAdmin || supabaseAuthed;
+    const { data: usage } = await usageClient
       .from('usage_daily')
       .select('count')
       .eq('user_id', user.id)
@@ -151,18 +155,25 @@ router.post('/', async (req, res) => {
     const respuestaTexto = await getPeronResponse(texto, historyText);
 
     if (token && supabaseAuthed && user) {
-      await supabaseAuthed.from('usage_daily').upsert({
+      const writer = supabaseAdmin || supabaseAuthed;
+      const { error: usageError } = await writer.from('usage_daily').upsert({
         user_id: user.id,
         date: today,
         count: currentCount + 1
       }, {
         onConflict: 'user_id,date'
       });
+      if (usageError) {
+        console.error('Error guardando uso diario:', usageError.message);
+      }
 
-      await supabaseAuthed.from('chat_history').insert([
+      const { error: historyError } = await writer.from('chat_history').insert([
         { user_id: user.id, role: 'user', text: texto },
         { user_id: user.id, role: 'peron', text: respuestaTexto }
       ]);
+      if (historyError) {
+        console.error('Error guardando historial:', historyError.message);
+      }
     } else {
       const key = `${clientIp}:${today}`;
       anonUsage.set(key, currentCount + 1);

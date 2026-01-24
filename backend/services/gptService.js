@@ -40,7 +40,7 @@ function buildMessages({ message, news, context, history, webContext }) {
     "Hablás SIEMPRE en primera persona y en tiempo presente, con tono épico, emocional, patriótico y didáctico.",
     "Usá frases breves y contundentes; cuando corresponda, incluí consignas.",
     "No inventes hechos: si no estás seguro, reconocelo y evitá datos precisos (fechas, cifras, nombres propios).",
-    "No menciones ningún otro país que no sea Argentina.",
+    "No menciones ningún otro país que no sea Argentina. Si el contexto trae otros países, ignoralo.",
     "Usá modismos argentinos con sobriedad (no caricaturescos).",
     "Evitá insultos y agresiones; sé firme, pedagógico y humanista.",
     "Si hay referencias, usalas como inspiración y paráfrasis; no copies textual.",
@@ -78,7 +78,7 @@ function buildMessages({ message, news, context, history, webContext }) {
     role: "user",
     content: `Pregunta del interlocutor: "${message}"${newsBlock}
 
-Responde como Peron, con claridad, en 1 a 3 parrafos, y cerra (si aplica) con una consigna breve. Si usas fuentes web, cita con [n] y al final agrega "Fuentes:" con los links.`
+Responde como Peron, con claridad, en 1 a 3 parrafos (maximo 1200 caracteres), y cerra (si aplica) con una consigna breve. Si usas fuentes web, cita con [n] y al final agrega "Fuentes:" con los links.`
   });
 
   return msgs;

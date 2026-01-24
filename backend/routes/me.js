@@ -5,6 +5,7 @@ const router = express.Router();
 
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const dailyLimitAuth = Number(process.env.FREE_DAILY_LIMIT_AUTH || 5);
 
 if (!supabaseUrl || !supabaseAnonKey) {
@@ -12,6 +13,7 @@ if (!supabaseUrl || !supabaseAnonKey) {
 }
 
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
+const supabaseAdmin = supabaseServiceKey ? createClient(supabaseUrl, supabaseServiceKey) : null;
 
 const getAuthUser = async (token) => {
   if (!token) return null;
@@ -37,14 +39,15 @@ router.get('/', async (req, res) => {
   const supabaseAuthed = createAuthedClient(token);
   const today = new Date().toISOString().slice(0, 10);
 
-  const { data: profile } = await supabaseAuthed
+  const profileClient = supabaseAdmin || supabaseAuthed;
+  const { data: profile } = await profileClient
     .from('profiles')
     .select('plan, mp_status')
     .eq('id', user.id)
     .single();
 
   if (!profile) {
-    await supabaseAuthed.from('profiles').upsert({
+    await profileClient.from('profiles').upsert({
       id: user.id,
       plan: 'free'
     });
@@ -54,13 +57,14 @@ router.get('/', async (req, res) => {
   let plan = profile?.plan || 'free';
   if (isActiveSub && plan !== 'pro') {
     plan = 'pro';
-    await supabaseAuthed.from('profiles').upsert({
+    await profileClient.from('profiles').upsert({
       id: user.id,
       plan: 'pro'
     });
   }
 
-  const { data: usage } = await supabaseAuthed
+  const usageClient = supabaseAdmin || supabaseAuthed;
+  const { data: usage } = await usageClient
     .from('usage_daily')
     .select('count')
     .eq('user_id', user.id)
