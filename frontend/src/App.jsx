@@ -23,6 +23,7 @@ function App() {
   const [subscriptionInfo, setSubscriptionInfo] = useState(null);
   const [subscriptionStatus, setSubscriptionStatus] = useState('');
   const [authOpen, setAuthOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState('chat');
   const defaultChat = [
     { role: 'peron', text: '¡Hola compañero! ¿En qué puedo ayudarte hoy?' }
   ];
@@ -51,6 +52,26 @@ function App() {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [authOpen]);
+
+  useEffect(() => {
+    const sectionIds = ['chat', 'contexto', 'propuesta', 'impacto', 'planes', 'privacidad'];
+    const sections = sectionIds
+      .map((id) => document.getElementById(id))
+      .filter(Boolean);
+    if (!sections.length) return undefined;
+
+    const observer = new IntersectionObserver((entries) => {
+      const visible = entries
+        .filter((entry) => entry.isIntersecting)
+        .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
+      if (visible.length) {
+        setActiveSection(visible[0].target.id);
+      }
+    }, { threshold: [0.2, 0.35, 0.5, 0.7] });
+
+    sections.forEach((section) => observer.observe(section));
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -255,8 +276,13 @@ function App() {
               <p className="brand-subtitle">Plataforma cívica contemporánea</p>
             </div>
           </div>
-          <nav className="nav">
-            <a href="#chat">Chat</a>
+          <nav className="nav" aria-label="Secciones principales">
+            <a className={activeSection === 'chat' ? 'active' : ''} href="#chat">Chat</a>
+            <a className={activeSection === 'contexto' ? 'active' : ''} href="#contexto">Contexto</a>
+            <a className={activeSection === 'propuesta' ? 'active' : ''} href="#propuesta">Propuesta</a>
+            <a className={activeSection === 'impacto' ? 'active' : ''} href="#impacto">Impacto</a>
+            <a className={activeSection === 'planes' ? 'active' : ''} href="#planes">Planes</a>
+            <a className={activeSection === 'privacidad' ? 'active' : ''} href="#privacidad">Privacidad</a>
           </nav>
           <div className="header-actions">
             {session ? (
