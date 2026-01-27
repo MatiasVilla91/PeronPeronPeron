@@ -13,7 +13,19 @@ if (!supabaseUrl || !supabaseAnonKey) {
 }
 
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
-const supabaseAdmin = supabaseServiceKey ? createClient(supabaseUrl, supabaseServiceKey) : null;
+const isServiceRoleKey = (key = "") => {
+  if (!key) return false;
+  if (key.startsWith('sb_secret_')) return true;
+  if (!key.startsWith('eyJ')) return false;
+  try {
+    const payload = JSON.parse(Buffer.from(key.split('.')[1], 'base64').toString('utf8'));
+    return payload?.role === 'service_role';
+  } catch (error) {
+    return false;
+  }
+};
+const useServiceRoleKey = isServiceRoleKey(supabaseServiceKey) && supabaseServiceKey !== supabaseAnonKey;
+const supabaseAdmin = useServiceRoleKey ? createClient(supabaseUrl, supabaseServiceKey) : null;
 
 const getAuthUser = async (token) => {
   if (!token) return null;

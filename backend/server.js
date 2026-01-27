@@ -73,6 +73,34 @@ app.use('/api/history', historyRouter);
 app.use('/api/subscription', subscribeLimiter, subscriptionRouter);
 app.use('/webhooks/mercadopago', mercadopagoWebhook);
 
+const isServiceRoleKey = (key = "") => {
+  if (!key) return false;
+  if (key.startsWith('sb_secret_')) return true;
+  if (!key.startsWith('eyJ')) return false;
+  try {
+    const payload = JSON.parse(Buffer.from(key.split('.')[1], 'base64').toString('utf8'));
+    return payload?.role === 'service_role';
+  } catch (error) {
+    return false;
+  }
+};
+
+app.get('/api/debug/supabase', (req, res) => {
+  const url = process.env.SUPABASE_URL || '';
+  const anonKey = process.env.SUPABASE_ANON_KEY || '';
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
+  const projectRef = url.replace(/^https?:\/\//, '').split('.')[0] || null;
+  const serviceRoleValid = isServiceRoleKey(serviceKey) && serviceKey !== anonKey;
+  res.json({
+    projectRef,
+    hasAnonKey: Boolean(anonKey),
+    hasServiceRoleKey: Boolean(serviceKey),
+    serviceRoleValid,
+    anonKeyStartsWith: anonKey ? anonKey.slice(0, 10) : null,
+    serviceKeyStartsWith: serviceKey ? serviceKey.slice(0, 10) : null
+  });
+});
+
 // Ruta de prueba basica
 app.get('/', (req, res) => {
   res.send('Backend del Bot Peron activo.');
