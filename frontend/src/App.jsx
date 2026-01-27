@@ -231,7 +231,70 @@ function App() {
           </nav>
           <div className="header-actions">
             {session ? (
-              <button className="ghost small" onClick={handleSignOut}>Salir</button>
+              <>
+                <div className="user-menu">
+                  <button
+                    className="user-trigger"
+                    type="button"
+                    aria-label="Ver tu cuenta"
+                    aria-haspopup="true"
+                  >
+                    <span aria-hidden="true">👤</span>
+                  </button>
+                  <div className="user-menu-popover">
+                    <div className="user-menu-header">
+                      <p className="user-menu-title">Tu cuenta</p>
+                      <span className={`user-plan ${userInfo?.isPro ? 'pro' : 'free'}`}>
+                        {userInfo?.isPro ? 'Pro' : 'Gratis'}
+                      </span>
+                    </div>
+                    <p className="user-menu-email">{userInfo?.email || 'Cuenta activa'}</p>
+                    {userLoading ? (
+                      <p className="user-menu-status">Actualizando datos...</p>
+                    ) : userInfo ? (
+                      <div className="user-menu-metrics">
+                        <div>
+                          <p className="user-panel-label">LÃ­mite diario</p>
+                          <p className="user-panel-value">{userInfo.dailyLimit}</p>
+                        </div>
+                        <div>
+                          <p className="user-panel-label">Usados hoy</p>
+                          <p className="user-panel-value">{userInfo.dailyCount}</p>
+                        </div>
+                        <div>
+                          <p className="user-panel-label">Fecha</p>
+                          <p className="user-panel-value">{userInfo.date}</p>
+                        </div>
+                      </div>
+                    ) : (
+                      <p className="user-menu-status">No pudimos cargar tus datos.</p>
+                    )}
+                    <div className="user-menu-actions">
+                      {subscriptionInfo?.hasSubscription ? (
+                        <>
+                          <button className="ghost small" type="button" onClick={() => handleSubscriptionAction('pause')}>
+                            Pausar
+                          </button>
+                          <button className="ghost small" type="button" onClick={() => handleSubscriptionAction('resume')}>
+                            Reanudar
+                          </button>
+                          <button className="ghost small danger" type="button" onClick={() => handleSubscriptionAction('cancel')}>
+                            Cancelar
+                          </button>
+                        </>
+                      ) : (
+                        <button className="ghost small" type="button" onClick={handleSubscribe}>
+                          Gestionar suscripciÃ³n
+                        </button>
+                      )}
+                      {subscriptionStatus && (
+                        <p className="user-panel-status">{subscriptionStatus}</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                <button className="ghost small" onClick={handleSignOut}>Salir</button>
+              </>
             ) : (
               <button className="cta small" type="button" onClick={() => setAuthOpen(true)}>
                 Sumarse
@@ -336,67 +399,6 @@ function App() {
                   <button className="new-chat" type="button">
                     Nueva conversación
                   </button>
-                  <div className="sidebar-block">
-                    <p className="sidebar-title">Tu cuenta</p>
-                    {session ? (
-                      <>
-                        <p className="sidebar-email">{userInfo?.email || 'Cuenta activa'}</p>
-                        <span className={`user-plan ${userInfo?.isPro ? 'pro' : 'free'}`}>
-                          {userInfo?.isPro ? 'Pro' : 'Gratis'}
-                        </span>
-                        {userLoading ? (
-                          <p className="sidebar-status">Actualizando datos...</p>
-                        ) : userInfo ? (
-                          <div className="sidebar-metrics">
-                            <div>
-                              <p className="user-panel-label">Límite diario</p>
-                              <p className="user-panel-value">{userInfo.dailyLimit}</p>
-                            </div>
-                            <div>
-                              <p className="user-panel-label">Usados hoy</p>
-                              <p className="user-panel-value">{userInfo.dailyCount}</p>
-                            </div>
-                            <div>
-                              <p className="user-panel-label">Fecha</p>
-                              <p className="user-panel-value">{userInfo.date}</p>
-                            </div>
-                          </div>
-                        ) : (
-                          <p className="sidebar-status">No pudimos cargar tus datos.</p>
-                        )}
-                        <div className="sidebar-actions">
-                          {subscriptionInfo?.hasSubscription ? (
-                            <>
-                              <button className="ghost small" type="button" onClick={() => handleSubscriptionAction('pause')}>
-                                Pausar
-                              </button>
-                              <button className="ghost small" type="button" onClick={() => handleSubscriptionAction('resume')}>
-                                Reanudar
-                              </button>
-                              <button className="ghost small danger" type="button" onClick={() => handleSubscriptionAction('cancel')}>
-                                Cancelar
-                              </button>
-                            </>
-                          ) : (
-                            <button className="ghost small" type="button" onClick={handleSubscribe}>
-                              Gestionar suscripción
-                            </button>
-                          )}
-                          {subscriptionStatus && (
-                            <p className="user-panel-status">{subscriptionStatus}</p>
-                          )}
-                        </div>
-                      </>
-                    ) : (
-                      <div className="access-card">
-                        <p className="access-title">Accede a tu cuenta</p>
-                        <p className="access-text">Guarda tu historial y desbloquea el plan Pro.</p>
-                        <button className="cta" type="button" onClick={() => setAuthOpen(true)}>
-                          Iniciar sesion
-                        </button>
-                      </div>
-                    )}
-                  </div>
                   <div className="sidebar-block">
                     <p className="sidebar-title">Historial</p>
                     {historyLoading ? (
@@ -561,6 +563,55 @@ function App() {
           </div>
         </section>
 
+        <section id="privacidad" className="section privacy-section">
+          <div className="container section-grid">
+            <div>
+              <p className="section-eyebrow">Privacidad</p>
+              <h2>Politica de privacidad.</h2>
+              <p className="section-lead">
+                Ultima actualizacion: 27/01/2026. Resumen breve con detalles opcionales.
+              </p>
+              <div className="privacy-note">
+                <p>
+                  Importante: este bot es una recreacion basada en documentos historicos. No es Juan Domingo Peron real.
+                </p>
+              </div>
+            </div>
+            <details className="privacy-details">
+              <summary>Ver resumen completo</summary>
+              <div className="privacy-card">
+                <h3>Que datos podemos recopilar</h3>
+                <ul>
+                  <li>Mensajes enviados al chat y respuestas generadas.</li>
+                  <li>Datos tecnicos basicos (fecha/hora, navegador, IP aproximada).</li>
+                  <li>Si creas cuenta, tu email y datos de sesion.</li>
+                </ul>
+                <h3>Para que los usamos</h3>
+                <ul>
+                  <li>Operar el servicio y mejorar la calidad de las respuestas.</li>
+                  <li>Seguridad, diagnostico de fallas y prevencion de abuso.</li>
+                </ul>
+                <h3>Entrenamiento y opt-out</h3>
+                <p>
+                  Si no queres que usemos tus mensajes para mejorar el sistema, escribinos y los excluimos.
+                </p>
+                <h3>Retencion</h3>
+                <p>
+                  Todavia no definimos un plazo fijo. Vamos a conservar los datos el minimo tiempo necesario y publicaremos el plazo aqui.
+                </p>
+                <h3>Terceros</h3>
+                <p>
+                  Usamos proveedores para operar el servicio, como Supabase (autenticacion/base de datos) y OpenAI (modelo de lenguaje).
+                </p>
+                <h3>Contacto</h3>
+                <p>
+                  Para consultas o solicitudes de borrado: soporte@peronperon.site
+                </p>
+              </div>
+            </details>
+          </div>
+        </section>
+
         
       </main>
 
@@ -598,6 +649,7 @@ function App() {
             <a href="#impacto">Impacto</a>
             <a href="#chat">Chat</a>
             <a href="#planes">Planes</a>
+            <a href="#privacidad">Privacidad</a>
           </div>
         </div>
       </footer>
