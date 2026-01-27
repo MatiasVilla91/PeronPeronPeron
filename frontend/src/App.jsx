@@ -23,6 +23,10 @@ function App() {
   const [subscriptionInfo, setSubscriptionInfo] = useState(null);
   const [subscriptionStatus, setSubscriptionStatus] = useState('');
   const [authOpen, setAuthOpen] = useState(false);
+  const defaultChat = [
+    { role: 'peron', text: '¡Hola compañero! ¿En qué puedo ayudarte hoy?' }
+  ];
+  const [chatMessages, setChatMessages] = useState(defaultChat);
 
   useEffect(() => {
     setIsRecovery(window.location.hash.includes('type=recovery'));
@@ -203,6 +207,31 @@ function App() {
     } catch (error) {
       setHistoryStatus('No pudimos borrar el elemento.');
     }
+  };
+
+  const resetChat = () => {
+    setChatMessages(defaultChat);
+  };
+
+  const loadHistoryConversation = (id) => {
+    const ordered = [...historyItems]
+      .filter((item) => item?.created_at)
+      .sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+    const startIndex = ordered.findIndex((item) => item.id === id);
+    if (startIndex === -1) return;
+    let endIndex = ordered.length;
+    for (let i = startIndex + 1; i < ordered.length; i += 1) {
+      if (ordered[i].role === 'user') {
+        endIndex = i;
+        break;
+      }
+    }
+    const segment = ordered.slice(startIndex, endIndex);
+    if (!segment.length) return;
+    setChatMessages(segment.map((item) => ({
+      role: item.role || 'user',
+      text: item.text || ''
+    })));
   };
 
   const formatHistoryTitle = (text = '') => {
@@ -396,7 +425,7 @@ function App() {
             ) : (
               <div className="chat-layout">
                 <aside className="chat-sidebar">
-                  <button className="new-chat" type="button">
+                  <button className="new-chat" type="button" onClick={resetChat}>
                     Nueva conversación
                   </button>
                   <div className="sidebar-block">
@@ -407,7 +436,7 @@ function App() {
                       <ul className="sidebar-history">
                         {historyDisplay.map((item) => (
                           <li key={item.id}>
-                            <span className="history-title">{formatHistoryTitle(item.text)}</span>
+                            <span className="history-title" onClick={() => loadHistoryConversation(item.id)}>{formatHistoryTitle(item.text)}</span>
                             <button
                               className="history-delete"
                               type="button"
@@ -436,7 +465,7 @@ function App() {
                   ) : isRecovery ? (
                     <ResetPasswordPanel />
                   ) : (
-                    <ChatBot accessToken={session?.access_token} />
+                    <ChatBot accessToken={session?.access_token} chat={chatMessages} setChat={setChatMessages} />
                   )}
                 </div>
               </div>

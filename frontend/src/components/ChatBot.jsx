@@ -5,12 +5,13 @@ const defaultApiUrl = window.location.hostname === 'localhost'
   : 'https://peronperonperon-1.onrender.com';
 const API_URL = import.meta.env.VITE_API_URL || defaultApiUrl;
 
-const ChatBot = ({ accessToken }) => {
+const ChatBot = ({ accessToken, chat, setChat }) => {
   const [input, setInput] = useState('');
-  const [chat, setChat] = useState([
-    { role: 'peron', text: '¡Hola compañero! ¿En qué puedo ayudarte hoy?' }
-  ]);
   const [isTyping, setIsTyping] = useState(false);
+  const chatState = chat || [
+    { role: 'peron', text: '¡Hola compañero! ¿En qué puedo ayudarte hoy?' }
+  ];
+  const setChatState = setChat || (() => {});
 
   const stripSourcesLabel = (text = '') => {
     return String(text)
@@ -73,8 +74,8 @@ const ChatBot = ({ accessToken }) => {
   const enviarMensaje = async () => {
     if (!input.trim()) return;
 
-    const nuevoChat = [...chat, { role: 'user', text: input }];
-    setChat(nuevoChat);
+    const nuevoChat = [...chatState, { role: 'user', text: input }];
+    setChatState(nuevoChat);
     setInput('');
 
     try {
@@ -93,7 +94,7 @@ const ChatBot = ({ accessToken }) => {
 
       if (res.status === 401) {
         setIsTyping(false);
-        setChat([
+        setChatState([
           ...nuevoChat,
           { role: 'peron', text: 'Si querés más beneficios, iniciá sesión.' }
         ]);
@@ -102,7 +103,7 @@ const ChatBot = ({ accessToken }) => {
 
       if (res.status === 429) {
         setIsTyping(false);
-        setChat([
+        setChatState([
           ...nuevoChat,
           { role: 'peron', text: 'Llegaste al límite diario. Pasá al plan Pro para seguir.' }
         ]);
@@ -111,14 +112,14 @@ const ChatBot = ({ accessToken }) => {
 
       const data = await res.json();
 
-      setChat([
+      setChatState([
         ...nuevoChat,
         { role: 'peron', text: data.texto }
       ]);
       setIsTyping(false);
     } catch (err) {
       setIsTyping(false);
-      setChat([
+      setChatState([
         ...nuevoChat,
         { role: 'peron', text: 'Error al contactar al General.' }
       ]);
@@ -136,7 +137,7 @@ const ChatBot = ({ accessToken }) => {
       </div>
 
       <div className="chatbot-body">
-        {chat.map((msg, i) => (
+        {chatState.map((msg, i) => (
           <div key={i} className={`chat-message ${msg.role}`}>
             {msg.role === 'peron' && (
               <img
