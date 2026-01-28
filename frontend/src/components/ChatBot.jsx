@@ -161,7 +161,13 @@ const ChatBot = ({ accessToken, chat, setChat }) => {
             />
             <div className="chat-bubble">
               <p className="chat-author">Perón</p>
-              <p className="chat-text">Escribiendo…</p>
+                            <p className="chat-text">
+                <span className="typing-indicator" aria-label="Peron esta escribiendo">
+                  <span />
+                  <span />
+                  <span />
+                </span>
+              </p>
             </div>
           </div>
         )}
