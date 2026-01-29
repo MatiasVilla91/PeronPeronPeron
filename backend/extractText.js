@@ -1,5 +1,6 @@
 const fs = require("fs");
-const pdf = require("pdf-parse");
+const path = require("path");
+let cachedPdfModule = null;
 
 // Función para detectar caracteres problemáticos
 function detectProblematicChars(text) {
@@ -15,8 +16,21 @@ function detectProblematicChars(text) {
 
 async function extractTextFromPDF(pdfPath) {
     try {
+        if (!cachedPdfModule) {
+            cachedPdfModule = await import("pdf-parse");
+        }
         const dataBuffer = fs.readFileSync(pdfPath);
-        const data = await pdf(dataBuffer);
+        let data = null;
+
+        if (typeof cachedPdfModule?.default === "function") {
+            data = await cachedPdfModule.default(dataBuffer);
+        } else if (typeof cachedPdfModule?.PDFParse === "function") {
+            const parser = new cachedPdfModule.PDFParse({ data: dataBuffer });
+            data = await parser.getText();
+            await parser.destroy();
+        } else {
+            throw new Error("pdf-parse no exporta una función ni PDFParse.");
+        }
 
         // Detectar caracteres problemáticos antes de limpiar
         const problematicChars = detectProblematicChars(data.text);
@@ -53,8 +67,8 @@ async function extractTextFromPDF(pdfPath) {
 }
 
 async function processPDFs() {
-    const folderPath = "./data/pdfs";
-    const outputPath = "./data/peron_docs.json";
+    const folderPath = path.join(__dirname, "data", "pdfs");
+    const outputPath = path.join(__dirname, "data", "peron_docs.json");
     const files = fs.readdirSync(folderPath);
 
     const documents = [];

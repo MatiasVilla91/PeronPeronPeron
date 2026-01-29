@@ -21,7 +21,16 @@ const NOISE_PATTERNS = [
     /austria 2593/i,
     /1425 buenos aires/i,
     /instituto nacional .*per[oó]n/i,
-    /tlfs\./i
+    /tlfs\./i,
+    /^\d+$/i,
+    /^\d+\.$/i,
+    /^[a-z]\.$/i,
+    /^[ivxlcdm]+\.$/i,
+    /^art\.$/i,
+    /^registro n\.?$/i,
+    /^documento n\.?$/i,
+    /^cit\.$/i,
+    /^cit\.,?\s*p(p)?\.$/i
 ];
 
 const STOPWORDS = new Set([
