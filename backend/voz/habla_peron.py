@@ -16,7 +16,8 @@ texto = sys.argv[1]
 ruta_salida = sys.argv[2]
 
 # Ruta a los prompts
-prompt_base = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "assets", "prompts"))
+prompt_base = os.path.abspath(os.path.join(
+    os.path.dirname(__file__), "..", "assets", "prompts"))
 
 # Filtrar solo archivos .npz dentro del folder (ignorar carpetas como v2 u otros nests si querés)
 npz_files = [
@@ -25,12 +26,13 @@ npz_files = [
 ]
 
 if not npz_files:
-    raise FileNotFoundError("❌ No se encontraron archivos .npz en la carpeta de prompts")
+    raise FileNotFoundError(
+        "❌ No se encontraron archivos .npz en la carpeta de prompts")
 
 # Elegir uno aleatorio
 prompt_filename = random.choice(npz_files)
 prompt_path = os.path.join(prompt_base, prompt_filename)
-print(f"🎙️ Usando voz: {prompt_filename}")
+print(f" Usando voz: {prompt_filename}")
 
 # Cargar el prompt
 history_data = np.load(prompt_path, allow_pickle=True)
@@ -44,4 +46,4 @@ history_prompt = {
 audio_array = generate_audio(texto, history_prompt=history_prompt)
 scipy.io.wavfile.write(ruta_salida, SAMPLE_RATE, audio_array)
 
-print("✅ Audio generado:", ruta_salida)
+print("Audio generado:", ruta_salida)
