@@ -405,8 +405,8 @@ function App() {
                 <div className="panel-row">
                   <span className="panel-dot" />
                   <div>
-                    <p className="panel-heading">Estado presente</p>
-                    <p className="panel-text">Trámites claros, respuestas rápidas, solución real.</p>
+                    <p className="panel-heading">Organización</p>
+                    <p className="panel-text">La organización vence al tiempo.</p>
                   </div>
                 </div>
                 <div className="panel-row">
