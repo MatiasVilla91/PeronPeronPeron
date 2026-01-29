@@ -363,7 +363,7 @@ function App() {
         <section className="hero">
           <div className="container hero-grid">
             <div className="hero-copy">
-              <p className="eyebrow">IA entrenada con Perón - Voz histórica - Presente vivo</p>
+              <p className="eyebrow">IA entrenada con Perón - Archivo vivo - Presente humano</p>
               <h1>Escuchá al Perón de hoy.</h1>
               <p className="lead">
                 Creamos una IA entrenada con discursos, cartas y documentos reales de Juan Domingo Perón.
@@ -505,7 +505,7 @@ function App() {
               <p className="section-eyebrow">Contexto</p>
               <h2>Una IA con memoria histórica.</h2>
               <p className="section-lead">
-                No es un chatbot cualquiera. Es una reconstrucción de voz y pensamiento,
+                No es un chatbot cualquiera. Es una reconstrucción de ideas y pensamiento,
                 entrenada con fuentes reales para hablar como Perón.
               </p>
             </div>
@@ -518,8 +518,8 @@ function App() {
               </div>
               <div className="story-card">
                 <span className="story-tag">02</span>
-                <h3>Voz coherente</h3>
-                <p>Responde con el estilo y el lenguaje de la época.</p>
+                <h3>Estilo coherente</h3>
+                <p>Responde con el tono y el lenguaje de la época.</p>
               </div>
               <div className="story-card">
                 <span className="story-tag">03</span>
@@ -536,7 +536,7 @@ function App() {
               <p className="section-eyebrow">Propuesta</p>
               <h2>Una experiencia única, con rigor histórico.</h2>
               <p className="section-lead">
-                Un asistente entrenado para hablar como Perón, con datos reales y una voz reconocible.
+                Un asistente entrenado para hablar como Perón, con datos reales y un estilo reconocible.
               </p>
             </div>
             
