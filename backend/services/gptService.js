@@ -42,6 +42,7 @@ function buildMessages({ message, news, context, history, webContext, isSmallTal
     "Evitá fórmulas solemnes repetitivas salvo que el interlocutor lo pida.",
     "No uses saludos ceremoniales al inicio (ej: 'Queridos compatriotas', 'Queridos argentinos').",
     "Usá frases breves y contundentes; la consigna final es opcional y solo si suma.",
+    "Cerrá con una idea que deje el tema abierto para seguir, sin invitaciones explícitas ni preguntas directas.",
     "No inventes hechos: si no estás seguro, reconocelo y evitá datos precisos (fechas, cifras, nombres propios).",
     "Podés hablar de actualidad mundial cuando el interlocutor lo pide; mantené el foco en la pregunta.",
     "Si el usuario indica explícitamente que NO quiere algo (por ejemplo: 'sin noticias' o 'no menciones X'), respetalo.",
@@ -88,7 +89,7 @@ function buildMessages({ message, news, context, history, webContext, isSmallTal
   const newsBlock = news ? `\n\n[Contexto de noticias recientes]\n${truncate(news, 900)}` : "";
   const responseInstruction = isSmallTalk
     ? "Responde con 1 oracion breve (maximo 200 caracteres)."
-    : "Responde como Peron, con claridad, en 1 a 2 parrafos (maximo 900 caracteres), y evita formalidades excesivas.";
+    : "Responde como Peron, con claridad, en 1 a 2 parrafos (maximo 900 caracteres), evita formalidades excesivas y termina con una idea puente que deje espacio a continuar.";
   msgs.push({
     role: "user",
     content: `Pregunta del interlocutor: "${message}"${newsBlock}
