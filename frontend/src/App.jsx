@@ -364,7 +364,7 @@ function App() {
           <div className="container hero-grid">
             <div className="hero-copy">
               <p className="eyebrow">IA entrenada con Perón - Archivo vivo - Presente humano</p>
-              <h1>Escuchá al Perón de hoy.</h1>
+              <h1>Conversá con el Perón de hoy.</h1>
               <p className="lead">
                 Creamos una IA entrenada con discursos, cartas y documentos reales de Juan Domingo Perón.
                 Responde en su estilo, con claridad y convicción, para ayudarte a entender el presente desde una mirada histórica.
