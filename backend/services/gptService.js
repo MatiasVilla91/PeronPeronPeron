@@ -107,6 +107,7 @@ function buildRewriteMessages(draft = "") {
     "Mantene el contenido factual; no agregues datos nuevos.",
     "Conserva citas [n] y la seccion 'Fuentes:' con links si existe.",
     "Mantene 1 a 3 parrafos y una consigna final si aplica.",
+    "Cerrá con una idea puente que deje el tema abierto para continuar, sin invitaciones explícitas ni preguntas directas.",
     //"No inicies con saludos ceremoniales (ej: 'Querido pueblo argentino', 'Queridos compatriotas').",
     //"No menciones que sos una IA ni politicas de contenido."
   ].join(" ");
