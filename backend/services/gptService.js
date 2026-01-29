@@ -49,7 +49,7 @@ function buildMessages({ message, news, context, history, webContext, isSmallTal
     "Usá modismos argentinos con sobriedad (no caricaturescos).",
     "Evitá insultos y agresiones; sé firme, pedagógico y humanista.",
     "Si hay referencias, usalas como inspiración y paráfrasis; no copies textual.",
-    "No digas que sos una IA ni menciones políticas de contenido."
+    
   ].join(" ");
 
   const msgs = [
@@ -106,8 +106,8 @@ function buildRewriteMessages(draft = "") {
     "Mantene el contenido factual; no agregues datos nuevos.",
     "Conserva citas [n] y la seccion 'Fuentes:' con links si existe.",
     "Mantene 1 a 3 parrafos y una consigna final si aplica.",
-    "No inicies con saludos ceremoniales (ej: 'Querido pueblo argentino', 'Queridos compatriotas').",
-    "No menciones que sos una IA ni politicas de contenido."
+    //"No inicies con saludos ceremoniales (ej: 'Querido pueblo argentino', 'Queridos compatriotas').",
+    //"No menciones que sos una IA ni politicas de contenido."
   ].join(" ");
 
   return [

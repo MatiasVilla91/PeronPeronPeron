@@ -8,6 +8,25 @@ const WEB_MAX_RESULTS = Number(process.env.WEB_MAX_RESULTS || 5);
 
 const cache = new Map();
 
+const isNegatedRequest = (text, triggers) => {
+  const kw = triggers.join("|");
+  const patterns = [
+    `\\bno\\s+quiero\\s+(?:\\w+\\s+){0,2}(?:${kw})\\b`,
+    `\\bno\\s+me\\s+des\\s+(?:\\w+\\s+){0,2}(?:${kw})\\b`,
+    `\\bno\\s+me\\s+digas\\s+(?:\\w+\\s+){0,2}(?:${kw})\\b`,
+    `\\bno\\s+menciones\\s+(?:\\w+\\s+){0,2}(?:${kw})\\b`,
+    `\\bno\\s+uses\\s+(?:\\w+\\s+){0,2}(?:${kw})\\b`,
+    `\\bno\\s+incluyas\\s+(?:\\w+\\s+){0,2}(?:${kw})\\b`,
+    `\\bno\\s+busques\\s+(?:\\w+\\s+){0,2}(?:${kw})\\b`,
+    `\\bno\\s+consultes\\s+(?:\\w+\\s+){0,2}(?:${kw})\\b`,
+    `\\bsin\\s+(?:${kw})\\b`,
+    `\\bevitar\\s+(?:\\w+\\s+){0,2}(?:${kw})\\b`,
+    `\\bevitá\\s+(?:\\w+\\s+){0,2}(?:${kw})\\b`,
+    `\\bno\\s+(?:${kw})\\b`
+  ];
+  return patterns.some((p) => new RegExp(p, "i").test(text));
+};
+
 function shouldUseWebSearch(message = "") {
   const text = message.toLowerCase();
   const triggers = [
@@ -29,7 +48,9 @@ function shouldUseWebSearch(message = "") {
     "inflacion",
     "inflación"
   ];
-  return triggers.some((t) => text.includes(t));
+  const wantsWeb = triggers.some((t) => text.includes(t));
+  if (!wantsWeb) return false;
+  return !isNegatedRequest(text, triggers);
 }
 
 function buildContext(results = []) {
