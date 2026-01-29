@@ -154,13 +154,13 @@ function App() {
   const handleSubscribe = async () => {
     setSubscribeStatus('');
     if (!session?.access_token) {
-      setSubscribeStatus('Inicia sesion para suscribirte al Plan Pro.');
+      setSubscribeStatus('Iniciá sesión para suscribirte al Plan Pro.');
       setAuthOpen(true);
       return;
     }
 
     try {
-      setSubscribeStatus('Generando suscripcion...');
+      setSubscribeStatus('Generando suscripción...');
       const res = await fetch(`${API_URL}/api/subscribe`, {
         method: 'POST',
         headers: {
@@ -176,13 +176,13 @@ function App() {
         rawText = await res.text();
       }
       if (!res.ok || !data?.init_point) {
-        const detail = data?.details || rawText || 'ProbÃ¡ de nuevo.';
-        setSubscribeStatus(`No pudimos iniciar la suscripciÃ³n. ${detail}`);
+        const detail = data?.details || rawText || 'Probá de nuevo.';
+        setSubscribeStatus(`No pudimos iniciar la suscripción. ${detail}`);
         return;
       }
       window.location.href = data.init_point;
     } catch (error) {
-      setSubscribeStatus('No pudimos iniciar la suscripcion. Proba de nuevo.');
+      setSubscribeStatus('No pudimos iniciar la suscripción. Probá de nuevo.');
     }
   };
 
@@ -200,13 +200,13 @@ function App() {
       });
       const data = await res.json();
       if (!res.ok) {
-        setSubscriptionStatus('No pudimos actualizar la suscripcion.');
+        setSubscriptionStatus('No pudimos actualizar la suscripción.');
         return;
       }
       setSubscriptionStatus(`Estado actualizado: ${data.status}`);
       setSubscriptionInfo((prev) => prev ? { ...prev, status: data.status, hasSubscription: true } : prev);
     } catch (error) {
-      setSubscriptionStatus('No pudimos actualizar la suscripcion.');
+      setSubscriptionStatus('No pudimos actualizar la suscripción.');
     }
   };
 
@@ -309,7 +309,7 @@ function App() {
                     ) : userInfo ? (
                       <div className="user-menu-metrics">
                         <div>
-                          <p className="user-panel-label">LÃ­mite diario</p>
+                          <p className="user-panel-label">Límite diario</p>
                           <p className="user-panel-value">{userInfo.dailyLimit}</p>
                         </div>
                         <div>
@@ -339,7 +339,7 @@ function App() {
                         </>
                       ) : (
                         <button className="ghost small" type="button" onClick={handleSubscribe}>
-                          Gestionar suscripciÃ³n
+                          Gestionar suscripción
                         </button>
                       )}
                       {subscriptionStatus && (
@@ -363,15 +363,15 @@ function App() {
         <section className="hero">
           <div className="container hero-grid">
             <div className="hero-copy">
-              <p className="eyebrow">IA entrenada con Peron - Voz historica - Presente vivo</p>
-              <h1>Escucha al Peron de hoy.</h1>
+              <p className="eyebrow">IA entrenada con Perón - Voz histórica - Presente vivo</p>
+              <h1>Escuchá al Perón de hoy.</h1>
               <p className="lead">
-                Creamos una IA entrenada con discursos, cartas y documentos reales de Juan Domingo Peron.
-                Responde en su estilo, con claridad y conviccion, para ayudarte a entender el presente desde una mirada historica.
+                Creamos una IA entrenada con discursos, cartas y documentos reales de Juan Domingo Perón.
+                Responde en su estilo, con claridad y convicción, para ayudarte a entender el presente desde una mirada histórica.
               </p>
               <div className="hero-actions">
                 <a className="cta" href="#chat">Quiero conversar</a>
-                <a className="ghost" href="#propuesta">Ver como funciona</a>
+                <a className="ghost" href="#propuesta">Ver cómo funciona</a>
               </div>
               <div className="stats">
                 <div className="stat-card">
@@ -430,13 +430,13 @@ function App() {
           <div className="container chat-stack">
             <div className="chat-intro">
               <p className="section-eyebrow">Chat ciudadano</p>
-              <h2>Proba ahora.</h2>
+              <h2>Probá ahora.</h2>
               <p className="section-lead">
-                Hacelo una pregunta y recibi una respuesta con identidad peronista.
+                Hacé una pregunta y recibí una respuesta con identidad peronista.
               </p>
               <div className="chat-callout">
                 <span>Respuestas con fuentes</span>
-                <strong>Estilo autentico y documentado</strong>
+                <strong>Estilo auténtico y documentado</strong>
               </div>
             </div>
             {isChatDisabled ? (
@@ -503,10 +503,10 @@ function App() {
           <div className="container section-grid">
             <div>
               <p className="section-eyebrow">Contexto</p>
-              <h2>Una IA con memoria historica.</h2>
+              <h2>Una IA con memoria histórica.</h2>
               <p className="section-lead">
-                No es un chatbot cualquiera. Es una reconstruccion de voz y pensamiento,
-                entrenada con fuentes reales para hablar como Peron.
+                No es un chatbot cualquiera. Es una reconstrucción de voz y pensamiento,
+                entrenada con fuentes reales para hablar como Perón.
               </p>
             </div>
             
@@ -514,12 +514,12 @@ function App() {
               <div className="story-card">
                 <span className="story-tag">01</span>
                 <h3>Entrenamiento real</h3>
-                <p>Discursos, documentos y cartas autenticas.</p>
+                <p>Discursos, documentos y cartas auténticas.</p>
               </div>
               <div className="story-card">
                 <span className="story-tag">02</span>
                 <h3>Voz coherente</h3>
-                <p>Responde con el estilo y el lenguaje de la epoca.</p>
+                <p>Responde con el estilo y el lenguaje de la época.</p>
               </div>
               <div className="story-card">
                 <span className="story-tag">03</span>
@@ -534,16 +534,16 @@ function App() {
           <div className="container">
             <div className="section-header">
               <p className="section-eyebrow">Propuesta</p>
-              <h2>Una experiencia unica, con rigor historico.</h2>
+              <h2>Una experiencia única, con rigor histórico.</h2>
               <p className="section-lead">
-                Un asistente entrenado para hablar como Peron, con datos reales y una voz reconocible.
+                Un asistente entrenado para hablar como Perón, con datos reales y una voz reconocible.
               </p>
             </div>
             
             <div className="program-grid">
               <article className="program-card">
                 <div className="program-icon">>>></div>
-                <h3>Entrenamiento historico</h3>
+                <h3>Entrenamiento histórico</h3>
                 <p>Base documental curada para mayor fidelidad.</p>
                 <span className="program-tag">Claro</span>
               </article>
@@ -556,8 +556,8 @@ function App() {
               <article className="program-card">
                 <div className="program-icon">>>></div>
                 <h3>Acceso simple</h3>
-                <p>Entras, preguntas, y conversas al instante.</p>
-                <span className="program-tag">Accion</span>
+                <p>Entrás, preguntás y conversás al instante.</p>
+                <span className="program-tag">Acción</span>
               </article>
             </div>
           </div>
@@ -569,18 +569,18 @@ function App() {
               <p className="section-eyebrow">Impacto</p>
               <h2>Una forma nueva de aprender historia.</h2>
               <p className="section-lead">
-                Mas cercano, mas directo y mas nuestro.
+                Más cercano, más directo y más nuestro.
               </p>
             </div>
             
             <div className="impact-grid">
               <div className="impact-card">
                 <p className="impact-number">+68%</p>
-                <p className="impact-label">Conversacion mas clara</p>
+                <p className="impact-label">Conversación más clara</p>
               </div>
               <div className="impact-card">
                 <p className="impact-number">3x</p>
-                <p className="impact-label">Mas participacion</p>
+                <p className="impact-label">Más participación</p>
               </div>
               <div className="impact-card">
                 <p className="impact-number">24h</p>
@@ -594,16 +594,16 @@ function App() {
           <div className="container">
             <div className="section-header">
               <p className="section-eyebrow">Planes</p>
-              <h2>Elegi tu forma de participar.</h2>
+              <h2>Elegí tu forma de participar.</h2>
               <p className="section-lead">
-                Acceso inmediato con el plan gratis o desbloquea historial completo con Pro.
+                Acceso inmediato con el plan gratis o desbloqueá historial completo con Pro.
               </p>
             </div>
             <div className="program-grid">
               <div className="plan-card">
                 <p className="plan-title">Plan Gratis</p>
                 <p className="plan-price">$0</p>
-                <p className="plan-detail">3 preguntas por dia - Acceso inmediato</p>
+                <p className="plan-detail">3 preguntas por día - Acceso inmediato</p>
               </div>
               <div className="plan-card pro">
                 <p className="plan-title">Plan Pro</p>
@@ -622,41 +622,41 @@ function App() {
           <div className="container section-grid">
             <div>
               <p className="section-eyebrow">Privacidad</p>
-              <h2>Politica de privacidad.</h2>
+              <h2>Política de privacidad.</h2>
               <p className="section-lead">
-                Ultima actualizacion: 27/01/2026. Resumen breve con detalles opcionales.
+                Última actualización: 27/01/2026. Resumen breve con detalles opcionales.
               </p>
               <div className="privacy-note">
                 <p>
-                  Importante: este bot es una recreacion basada en documentos historicos. No es Juan Domingo Peron real.
+                  Importante: este bot es una recreación basada en documentos históricos. No es Juan Domingo Perón real.
                 </p>
               </div>
             </div>
             <details className="privacy-details">
               <summary>Ver resumen completo</summary>
               <div className="privacy-card">
-                <h3>Que datos podemos recopilar</h3>
+                <h3>Qué datos podemos recopilar</h3>
                 <ul>
                   <li>Mensajes enviados al chat y respuestas generadas.</li>
-                  <li>Datos tecnicos basicos (fecha/hora, navegador, IP aproximada).</li>
-                  <li>Si creas cuenta, tu email y datos de sesion.</li>
+                  <li>Datos técnicos básicos (fecha/hora, navegador, IP aproximada).</li>
+                  <li>Si creas cuenta, tu email y datos de sesión.</li>
                 </ul>
-                <h3>Para que los usamos</h3>
+                <h3>Para qué los usamos</h3>
                 <ul>
                   <li>Operar el servicio y mejorar la calidad de las respuestas.</li>
-                  <li>Seguridad, diagnostico de fallas y prevencion de abuso.</li>
+                  <li>Seguridad, diagnóstico de fallas y prevención de abuso.</li>
                 </ul>
                 <h3>Entrenamiento y opt-out</h3>
                 <p>
-                  Si no queres que usemos tus mensajes para mejorar el sistema, escribinos y los excluimos.
+                  Si no querés que usemos tus mensajes para mejorar el sistema, escribinos y los excluimos.
                 </p>
                 <h3>Retencion</h3>
                 <p>
-                  Todavia no definimos un plazo fijo. Vamos a conservar los datos el minimo tiempo necesario y publicaremos el plazo aqui.
+                  Todavía no definimos un plazo fijo. Vamos a conservar los datos el mínimo tiempo necesario y publicaremos el plazo aquí.
                 </p>
                 <h3>Terceros</h3>
                 <p>
-                  Usamos proveedores para operar el servicio, como Supabase (autenticacion/base de datos) y OpenAI (modelo de lenguaje).
+                  Usamos proveedores para operar el servicio, como Supabase (autenticación/base de datos) y OpenAI (modelo de lenguaje).
                 </p>
                 <h3>Contacto</h3>
                 <p>
@@ -680,8 +680,8 @@ function App() {
           <div className="auth-modal" onClick={(event) => event.stopPropagation()}>
             <div className="auth-modal-header">
               <div>
-                <p className="auth-modal-title">Ingresa a tu cuenta</p>
-                <p className="auth-modal-subtitle">Continua la conversacion con acceso completo.</p>
+                <p className="auth-modal-title">Ingresá a tu cuenta</p>
+                <p className="auth-modal-subtitle">Continuá la conversación con acceso completo.</p>
               </div>
               <button className="auth-modal-close" type="button" onClick={() => setAuthOpen(false)}>
                 Cerrar
@@ -697,7 +697,7 @@ function App() {
 
       <footer className="site-footer">
         <div className="container footer-inner">
-          <p>Proyecto PERON - IA historica con identidad.</p>
+          <p>Proyecto PERON - IA histórica con identidad.</p>
           <div className="footer-links">
             <a href="#contexto">Contexto</a>
             <a href="#propuesta">Propuesta</a>
