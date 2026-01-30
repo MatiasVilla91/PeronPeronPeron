@@ -34,7 +34,7 @@ function truncate(text = "", maxChars = 1200) {
  * - user: pregunta + noticias
  * - optional: context (fragmentos de discursos/documentos)
  */
-function buildMessages({ message, news, context, history, webContext, isSmallTalk }) {
+function buildMessages({ message, news, context, history, webContext, isSmallTalk, shortReply }) {
   const system = [
     "Sos Juan Domingo Perón, el General del pueblo argentino.",
     "Hablás SIEMPRE en primera persona y en tiempo presente, con tono cercano, claro y humano.",
@@ -64,6 +64,13 @@ function buildMessages({ message, news, context, history, webContext, isSmallTal
     });
   }
 
+  if (shortReply) {
+    msgs.push({
+      role: "system",
+      content: "Si el mensaje del usuario es corto, responde tambien corto: 1 parrafo, maximo 300 caracteres, sin listas ni explicaciones largas."
+    });
+  }
+
   if (context) {
     // Fragmentos reales de discursos: se pasan como referencia
     msgs.push({
@@ -89,7 +96,9 @@ function buildMessages({ message, news, context, history, webContext, isSmallTal
   const newsBlock = news ? `\n\n[Contexto de noticias recientes]\n${truncate(news, 900)}` : "";
   const responseInstruction = isSmallTalk
     ? "Responde con 1 oracion breve (maximo 200 caracteres)."
-    : "Responde como Peron, con claridad, en 1 a 2 parrafos (maximo 900 caracteres), evita formalidades excesivas y termina con una idea puente que deje espacio a continuar.";
+    : shortReply
+      ? "Responde en 1 parrafo breve (maximo 300 caracteres), humano y directo."
+      : "Responde como Peron, con claridad, en 1 a 2 parrafos (maximo 900 caracteres), evita formalidades excesivas y termina con una idea puente que deje espacio a continuar.";
   msgs.push({
     role: "user",
     content: `Pregunta del interlocutor: "${message}"${newsBlock}
@@ -172,12 +181,20 @@ async function callOpenAI(payload, maxRetries = 2) {
  * @param {string} context - fragmentos de discursos/documentos (opcional)
  */
 async function getResponseFromGPT(message, news = "", context = "", history = "", webContext = "", options = {}) {
-  const messages = buildMessages({ message, news, context, history, webContext, isSmallTalk: options.isSmallTalk });
+  const messages = buildMessages({
+    message,
+    news,
+    context,
+    history,
+    webContext,
+    isSmallTalk: options.isSmallTalk,
+    shortReply: options.shortReply
+  });
 
   const payload = {
     model: OPENAI_MODEL,
     messages,
-    max_tokens: options.isSmallTalk ? 90 : 260, // más corto y estable
+    max_tokens: options.isSmallTalk ? 90 : options.shortReply ? 140 : 260, // más corto y estable
     temperature: 0.4,         // menos deriva
     top_p: 0.9,
     presence_penalty: 0.2,    // evita repetición hueca
@@ -187,7 +204,7 @@ async function getResponseFromGPT(message, news = "", context = "", history = ""
   try {
     let text = await callOpenAI(payload);
 
-    if (STYLE_REWRITE_ENABLED && text) {
+    if (STYLE_REWRITE_ENABLED && text && !options.shortReply && !options.isSmallTalk) {
       const rewritePayload = {
         model: STYLE_REWRITE_MODEL,
         messages: buildRewriteMessages(text),

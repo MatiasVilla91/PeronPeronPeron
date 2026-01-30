@@ -121,8 +121,24 @@ const normalizeSmallTalk = (value = "") => String(value)
 const isSmallTalk = (message = "") => {
   const text = normalizeSmallTalk(message);
   if (!text) return true;
-  if (text.length > 24) return false;
-  return SMALL_TALK_PATTERNS.some((p) => p.test(text));
+  const words = text.split(" ").filter(Boolean);
+  if (words.length > 5) return false;
+  if (text.length > 40) return false;
+  if (SMALL_TALK_PATTERNS.some((p) => p.test(text))) return true;
+  if (words[0] === "hola" || words[0] === "buenas" || words[0] === "buenos") {
+    return words.length <= 4;
+  }
+  if (words[0] === "que" && words[1] === "tal") return true;
+  if (words[0] === "como" && words[1]?.startsWith("esta")) return true;
+  return false;
+};
+
+const isShortInput = (message = "") => {
+  const text = normalizeSmallTalk(message);
+  if (!text) return true;
+  const words = text.split(" ").filter(Boolean);
+  if (words.length <= 6) return true;
+  return text.length <= 50;
 };
 
 const isNegatedRequest = (text, keywords) => {
@@ -155,6 +171,7 @@ async function getPeronResponse(message, history = "") {
       return SAFETY_BLOCK_MESSAGE;
     }
     const smallTalk = isSmallTalk(message);
+    const shortReply = !smallTalk && isShortInput(message);
     // 1) Traer fragmentos de discursos relacionados
     const context = smallTalk ? "" : await getRelevantContext(message);
 
@@ -171,7 +188,7 @@ async function getPeronResponse(message, history = "") {
       context,
       smallTalk ? "" : history,
       webContext,
-      { isSmallTalk: smallTalk }
+      { isSmallTalk: smallTalk, shortReply }
     );
     return gptResponse;
   } catch (error) {
