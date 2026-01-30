@@ -1471,6 +1471,10 @@
   }
 
   .chatbot-body {
-    max-height: 320px;
+    max-height: 60vh;
+  }
+
+  .chat-shell {
+    min-height: 70vh;
   }
 }
