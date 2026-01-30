@@ -24,6 +24,13 @@ function App() {
   const [subscriptionStatus, setSubscriptionStatus] = useState('');
   const [authOpen, setAuthOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('chat');
+  const [theme, setTheme] = useState(() => {
+    if (typeof window === 'undefined') return 'light';
+    const stored = window.localStorage.getItem('peron-theme');
+    if (stored === 'dark' || stored === 'light') return stored;
+    if (window.matchMedia?.('(prefers-color-scheme: dark)').matches) return 'dark';
+    return 'light';
+  });
   const defaultChat = [
     { role: 'peron', text: '¡Hola compañero! ¿En qué puedo ayudarte hoy?' }
   ];
@@ -52,6 +59,11 @@ function App() {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [authOpen]);
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+    window.localStorage.setItem('peron-theme', theme);
+  }, [theme]);
 
   useEffect(() => {
     const sectionIds = ['chat', 'contexto', 'propuesta', 'impacto', 'planes', 'privacidad'];
@@ -149,6 +161,10 @@ function App() {
       await supabase.auth.signOut();
       setSession(null);
     }
+  };
+
+  const toggleTheme = () => {
+    setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
   };
 
   const handleSubscribe = async () => {
@@ -285,6 +301,20 @@ function App() {
             <a className={activeSection === 'privacidad' ? 'active' : ''} href="#privacidad">Privacidad</a>
           </nav>
           <div className="header-actions">
+            <div className="theme-toggle">
+              <label className="theme-switch">
+                <input
+                  type="checkbox"
+                  checked={theme === 'dark'}
+                  onChange={toggleTheme}
+                  aria-label="Activar modo oscuro"
+                />
+                <span className="switch-track" aria-hidden="true">
+                  <span className="switch-thumb" />
+                </span>
+                <span className="switch-label">Modo oscuro</span>
+              </label>
+            </div>
             {session ? (
               <>
                 <div className="user-menu">

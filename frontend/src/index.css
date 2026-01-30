@@ -1,6 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Sora:wght@300;400;500;600;700&display=swap');
 
 :root {
+  color-scheme: light;
   --font-body: 'Sora', 'Segoe UI', sans-serif;
   --font-title: 'DM Serif Display', 'Times New Roman', serif;
   --sky-600: #1a84d9;
@@ -11,6 +12,69 @@
   --ink-700: #324765;
   --ink-600: #4a5f7a;
   --ink-500: #6b7d96;
+  --surface-base: #f7fbff;
+  --app-gradient:
+    radial-gradient(1200px 600px at 85% -5%, rgba(252, 198, 60, 0.25), transparent 60%),
+    radial-gradient(900px 500px at 5% 10%, rgba(64, 169, 230, 0.25), transparent 55%),
+    linear-gradient(180deg, #f7fbff 0%, #eef6ff 45%, #ffffff 100%);
+  --surface-glass: rgba(255, 255, 255, 0.85);
+  --surface-glass-soft: rgba(255, 255, 255, 0.8);
+  --surface-ghost: rgba(255, 255, 255, 0.6);
+  --surface-popover: rgba(255, 255, 255, 0.98);
+  --surface-card: rgba(255, 255, 255, 0.9);
+  --surface-card-strong: #ffffff;
+  --surface-card-soft: rgba(255, 255, 255, 0.75);
+  --surface-panel: rgba(255, 255, 255, 0.92);
+  --surface-strong: rgba(255, 255, 255, 0.95);
+  --surface-footer: rgba(255, 255, 255, 0.8);
+  --surface-input: rgba(255, 255, 255, 0.9);
+  --surface-details: rgba(255, 255, 255, 0.8);
+  --border-soft: rgba(3, 46, 99, 0.08);
+  --border-strong: rgba(3, 46, 99, 0.12);
+  --border-stronger: rgba(3, 46, 99, 0.18);
+  --border-strongest: rgba(3, 46, 99, 0.2);
+  --section-alt-bg: linear-gradient(180deg, rgba(12, 90, 166, 0.08), rgba(255, 255, 255, 0.9));
+  --bubble-peron-bg: rgba(12, 90, 166, 0.08);
+  --bubble-user-bg: rgba(227, 156, 26, 0.14);
+  --switch-track: rgba(12, 90, 166, 0.16);
+  --switch-track-active: rgba(12, 90, 166, 0.32);
+  --switch-thumb: #ffffff;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --ink-900: #f2f5fb;
+  --ink-800: #d5deea;
+  --ink-700: #b9c6d8;
+  --ink-600: #9fb0c6;
+  --ink-500: #7f93ac;
+  --surface-base: #0b111a;
+  --app-gradient:
+    radial-gradient(1200px 600px at 85% -5%, rgba(247, 195, 90, 0.12), transparent 60%),
+    radial-gradient(900px 500px at 5% 10%, rgba(64, 169, 230, 0.12), transparent 55%),
+    linear-gradient(180deg, #0b111a 0%, #0f1724 45%, #111b2a 100%);
+  --surface-glass: rgba(12, 18, 28, 0.8);
+  --surface-glass-soft: rgba(12, 18, 28, 0.7);
+  --surface-ghost: rgba(15, 22, 34, 0.6);
+  --surface-popover: rgba(15, 22, 34, 0.95);
+  --surface-card: rgba(15, 22, 34, 0.9);
+  --surface-card-strong: #121a26;
+  --surface-card-soft: rgba(16, 24, 36, 0.8);
+  --surface-panel: rgba(14, 21, 33, 0.92);
+  --surface-strong: rgba(15, 22, 34, 0.95);
+  --surface-footer: rgba(11, 17, 26, 0.8);
+  --surface-input: rgba(15, 22, 34, 0.9);
+  --surface-details: rgba(12, 19, 30, 0.8);
+  --border-soft: rgba(148, 179, 214, 0.18);
+  --border-strong: rgba(148, 179, 214, 0.24);
+  --border-stronger: rgba(148, 179, 214, 0.32);
+  --border-strongest: rgba(148, 179, 214, 0.4);
+  --section-alt-bg: linear-gradient(180deg, rgba(12, 90, 166, 0.18), rgba(12, 18, 28, 0.95));
+  --bubble-peron-bg: rgba(64, 169, 230, 0.2);
+  --bubble-user-bg: rgba(247, 195, 90, 0.2);
+  --switch-track: rgba(148, 179, 214, 0.28);
+  --switch-track-active: rgba(64, 169, 230, 0.55);
+  --switch-thumb: #0b111a;
 }
 
 * {
@@ -20,7 +84,7 @@
 body {
   margin: 0;
   font-family: var(--font-body);
-  background: #f7fbff;
+  background: var(--surface-base);
 }
 
 #root {
