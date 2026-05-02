@@ -1065,6 +1065,7 @@
   cursor: pointer;
 }
 
+
 .chatbot-input {
   display: grid;
   grid-template-columns: 1fr auto;
