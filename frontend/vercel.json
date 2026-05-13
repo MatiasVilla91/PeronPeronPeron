@@ -1,0 +1,10 @@
+{
+  "redirects": [
+    {
+      "source": "/(.*)",
+      "has": [{ "type": "host", "value": "peronperon.site" }],
+      "destination": "https://peronia.site/$1",
+      "permanent": true
+    }
+  ]
+}
