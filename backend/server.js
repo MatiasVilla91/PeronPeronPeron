@@ -18,7 +18,7 @@ const app = express();
 const port = process.env.PORT || 3000;
 const allowedOrigins = new Set(
   (process.env.ALLOWED_ORIGINS
-    || 'https://peronperon.netlify.app,https://peronperon.site,https://www.peronperon.site,http://localhost:5173,http://localhost:5174,http://127.0.0.1:5173,http://127.0.0.1:5174')
+    || 'https://peronperon.netlify.app,https://peronperon.site,https://www.peronperon.site,http://localhost:5173,http://localhost:5174,http://127.0.0.1:5173,http://127.0.0.1:5174,https://peronia.site')
     .split(',')
     .map((origin) => origin.trim())
     .filter(Boolean)
