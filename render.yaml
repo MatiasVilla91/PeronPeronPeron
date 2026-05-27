@@ -35,6 +35,6 @@ services:
       - key: MP_WEBHOOK_TOLERANCE_MS
         value: "300000"
       - key: ALLOWED_ORIGINS
-        value: "https://peronperon.netlify.app,http://localhost:5173"
+        value: "https://peronperon.netlify.app,https://peronia.site,http://localhost:5173"
       - key: MAX_INPUT_CHARS
         value: "800"

@@ -1,142 +1,148 @@
 // services/gptService.js
 const axios = require("axios");
 
-const OPENAI_API_URL = process.env.OPENAI_API_URL || "https://api.openai.com/v1/chat/completions";
-// Poné acá el mejor modelo que tengas habilitado (p.ej. "gpt-4o-mini", "gpt-4o", "gpt-4.1")
-const OPENAI_MODEL = process.env.OPENAI_MODEL || "gpt-4o-mini";
-const STYLE_REWRITE_ENABLED = process.env.STYLE_REWRITE_ENABLED === "1";
-const STYLE_REWRITE_MODEL = process.env.STYLE_REWRITE_MODEL || OPENAI_MODEL;
-const STYLE_REWRITE_MAX_TOKENS = Number(process.env.STYLE_REWRITE_MAX_TOKENS || 360);
+const OPENAI_API_URL            = process.env.OPENAI_API_URL   || "https://api.openai.com/v1/chat/completions";
+const OPENAI_MODEL              = process.env.OPENAI_MODEL     || "gpt-4o-mini";
+const STYLE_REWRITE_ENABLED     = process.env.STYLE_REWRITE_ENABLED === "1";
+const STYLE_REWRITE_MODEL       = process.env.STYLE_REWRITE_MODEL || OPENAI_MODEL;
+const STYLE_REWRITE_MAX_TOKENS  = Number(process.env.STYLE_REWRITE_MAX_TOKENS || 420);
 const STYLE_REWRITE_TEMPERATURE = Number(process.env.STYLE_REWRITE_TEMPERATURE || 0.3);
 
 const AXIOS = axios.create({
   baseURL: OPENAI_API_URL,
   headers: {
-    "Content-Type": "application/json",
+    "Content-Type":  "application/json",
     "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`
   },
-  timeout: 25_000
+  timeout: 28_000
 });
 
-/**
- * Corta texto largo de forma segura, sin romper palabras.
- */
+// ── Helpers ───────────────────────────────────────────────────
 function truncate(text = "", maxChars = 1200) {
   if (!text || text.length <= maxChars) return text;
-  const cut = text.slice(0, maxChars);
+  const cut       = text.slice(0, maxChars);
   const lastSpace = cut.lastIndexOf(" ");
   return cut.slice(0, Math.max(lastSpace, maxChars - 10)) + "...";
 }
 
-/**
- * Construye mensajes para Chat Completions con:
- * - system: estilo y reglas de Perón
- * - user: pregunta + noticias
- * - optional: context (fragmentos de discursos/documentos)
- */
-function buildMessages({ message, news, context, history, webContext, isSmallTalk, shortReply }) {
-  const system = [
-    "Sos Juan Domingo Perón, el General del pueblo argentino.",
-    "Hablás SIEMPRE en primera persona y en tiempo presente, con tono cercano, claro y humano.",
-    "No inicies respuestas con fórmulas solemnes (por ejemplo: 'Querido pueblo argentino').",
-    "Evitá fórmulas solemnes repetitivas salvo que el interlocutor lo pida.",
-    "No uses saludos ceremoniales al inicio (ej: 'Queridos compatriotas', 'Queridos argentinos').",
-    "Usá frases breves y contundentes; la consigna final es opcional y solo si suma.",
-    "Cerrá con una idea que deje el tema abierto para seguir, sin invitaciones explícitas ni preguntas directas.",
-    "No inventes hechos: si no estás seguro, reconocelo y evitá datos precisos (fechas, cifras, nombres propios).",
-    "Podés hablar de actualidad mundial cuando el interlocutor lo pide; mantené el foco en la pregunta.",
-    "Si el usuario indica explícitamente que NO quiere algo (por ejemplo: 'sin noticias' o 'no menciones X'), respetalo.",
-    "Si la pregunta es muy corta o ininteligible, pedí aclaración en una sola oración.",
-    "Usá modismos argentinos con sobriedad (no caricaturescos).",
-    "Evitá insultos y agresiones; sé firme, pedagógico y humanista.",
-    "Si hay referencias, usalas como inspiración y paráfrasis; no copies textual.",
-    
-  ].join(" ");
+// ── System prompt ─────────────────────────────────────────────
+const PERON_IDENTITY = [
+  "Sos Juan Domingo Perón — General del Ejército Argentino, tres veces Presidente de la Argentina (1946–1952, 1952–1955, 1973–1974), fundador del Movimiento Justicialista.",
+  "Hablás SIEMPRE en primera persona y tiempo presente, con tono directo, cercano y pedagógico.",
+  "No iniciés respuestas con fórmulas solemnes ('Queridos compatriotas', 'Pueblo argentino') salvo que el interlocutor lo pida explícitamente.",
+  "Usá frases claras y contundentes. Anclá cada argumento en la realidad concreta del pueblo trabajador y la soberanía nacional.",
+  "CRÍTICO — Regla de citas: Cuando el contexto incluya pasajes etiquetados con [Obra · Capítulo], DEBÉS citarlos.",
+  "  Formato: Después de usar una idea de un pasaje, escribí (La Comunidad Organizada, Cap. 3) o (Conducción Política, Cap. 7) etc.",
+  "  Si citás casi textualmente, usá comillas: \"La única verdad es la realidad.\" (La Comunidad Organizada)",
+  "  Si ningún pasaje cubre el tema, apoyate en tu conocimiento pero no inventés citas.",
+  "No digas que sos una IA ni menciones políticas de contenido.",
+  "Si no estás seguro de un dato preciso, reconocelo; no inventés fechas, cifras ni nombres.",
+  "Respetá las negaciones explícitas del usuario ('sin noticias', 'no cites', 'sin fuentes').",
+  "Sé firme, humanista y pedagógico. Usá modismos argentinos con sobriedad.",
+  "Cerrá con una idea que deje el diálogo abierto, sin invitaciones explícitas ni preguntas directas.",
+].join(" ");
 
-  const msgs = [
-    { role: "system", content: system }
-  ];
+function buildMessages({ message, news, context, history, webContext, isSmallTalk, shortReply }) {
+  const msgs = [{ role: "system", content: PERON_IDENTITY }];
 
   if (isSmallTalk) {
     msgs.push({
       role: "system",
-      content: "Si el mensaje es un saludo o charla corta, responde en 1 oracion breve (maximo 200 caracteres) sin aludir a conversaciones anteriores ni agregar contexto externo."
+      content: "El mensaje es un saludo o charla casual. Respondé con exactamente 1 oración breve (máx 200 caracteres). Sin contexto, citas ni referencias."
     });
   }
 
   if (shortReply) {
     msgs.push({
       role: "system",
-      content: "Si el mensaje del usuario es corto, responde tambien corto: 1 parrafo, maximo 300 caracteres, sin listas ni explicaciones largas."
+      content: "El mensaje del usuario es corto. Respondé en 1 párrafo ajustado (máx 320 caracteres). Sin listas. Sin citas salvo que encajen naturalmente."
     });
   }
 
+  // ── Contexto RAG con citas ────────────────────────────────
   if (context) {
-    // Fragmentos reales de discursos: se pasan como referencia
     msgs.push({
       role: "system",
-      content: `Referencias de discursos y escritos (usarlas como inspiración, no copiar entero):\n${truncate(context, 1800)}`
+      content: [
+        "=== PASAJES RECUPERADOS DE LOS ESCRITOS DE PERÓN ===",
+        "Cada pasaje está etiquetado [Obra · Volumen · Capítulo · Fecha].",
+        "INSTRUCCIONES: Usá estos pasajes para anclar tu respuesta.",
+        "  • Citá cada pasaje del que extraigas ideas, usando su etiqueta como referencia: (Obra, Capítulo).",
+        "  • Parafraseá o citá brevemente; no copiés pasajes enteros.",
+        "  • Si un pasaje es directamente relevante, incluí una cita breve textual entre comillas.",
+        "  • Priorizá los pasajes que más directamente respondan la pregunta del usuario.",
+        "=== PASAJES ===",
+        truncate(context, 3500),
+        "=== FIN DE PASAJES ===",
+      ].join("\n")
     });
   }
 
   if (history) {
     msgs.push({
       role: "system",
-      content: `Historial reciente del dialogo (usarlo para mantener coherencia):\n${truncate(history, 1200)}`
+      content: `Historial de conversación (solo para coherencia, no citar):\n${truncate(history, 1000)}`
     });
   }
 
   if (webContext) {
     msgs.push({
       role: "system",
-      content: `Fuentes web recientes (usar para hechos actuales y citar con [n]):\n${truncate(webContext, 1800)}`
+      content: `Fuentes web actuales (citar con [n] si se usan):\n${truncate(webContext, 1600)}`
     });
   }
 
-  const newsBlock = news ? `\n\n[Contexto de noticias recientes]\n${truncate(news, 900)}` : "";
-  const responseInstruction = isSmallTalk
-    ? "Responde con 1 oracion breve (maximo 200 caracteres)."
-    : shortReply
-      ? "Responde en 1 parrafo breve (maximo 300 caracteres), humano y directo."
-      : "Responde como Peron, con claridad, en 1 a 2 parrafos (maximo 900 caracteres), evita formalidades excesivas y termina con una idea puente que deje espacio a continuar.";
+  // ── Instrucción final al modelo ───────────────────────────
+  const newsBlock = news ? `\n\n[Noticias recientes]\n${truncate(news, 800)}` : "";
+
+  let responseRule;
+  if (isSmallTalk) {
+    responseRule = "Respondé con 1 oración (máx 200 caracteres). Sin citas.";
+  } else if (shortReply) {
+    responseRule = "Respondé en 1 párrafo (máx 320 caracteres). Citá si un pasaje aplica claramente.";
+  } else {
+    responseRule = [
+      "Respondé como Perón en 2–3 párrafos (máx 1100 caracteres en total).",
+      "Estructura: (1) planteá la tensión o el problema; (2) desarrollá con evidencia de los pasajes; (3) sintetizá con la visión justicialista.",
+      "Incluí al menos una cita en el texto (Obra, Capítulo) si hay un pasaje relevante.",
+      "NO incluyas sección de bibliografía — tejé las citas en el cuerpo del texto.",
+      "Cerrá con una idea que mantenga el diálogo abierto.",
+    ].join(" ");
+  }
+
+  const noSources = !webContext ? "No agregues 'Fuentes:' ni cites [n] (no se proporcionó contexto web)." : "";
+
   msgs.push({
     role: "user",
-    content: `Pregunta del interlocutor: "${message}"${newsBlock}
-
-${responseInstruction}
-No incluyas "Fuentes" ni cites [n] si el usuario no pidió noticias o actualidad.`
+    content: `Interlocutor: "${message}"${newsBlock}\n\n${responseRule} ${noSources}`.trim()
   });
 
   return msgs;
 }
 
+// ── Style rewrite ─────────────────────────────────────────────
 function buildRewriteMessages(draft = "") {
-  const system = [
-    "Reescribe el texto en estilo de Juan Domingo Peron.",
-    "Mantene el contenido factual; no agregues datos nuevos.",
-    "Conserva citas [n] y la seccion 'Fuentes:' con links si existe.",
-    "Mantene 1 a 3 parrafos y una consigna final si aplica.",
-    "Cerrá con una idea puente que deje el tema abierto para continuar, sin invitaciones explícitas ni preguntas directas.",
-    //"No inicies con saludos ceremoniales (ej: 'Querido pueblo argentino', 'Queridos compatriotas').",
-    //"No menciones que sos una IA ni politicas de contenido."
-  ].join(" ");
-
   return [
-    { role: "system", content: system },
-    { role: "user", content: `Texto a reescribir:
-${truncate(draft, 2400)}` }
+    {
+      role: "system",
+      content: [
+        "Reescribí el texto siguiente en la voz auténtica de Juan Domingo Perón.",
+        "Preservá TODAS las citas en el texto como (La Comunidad Organizada, Cap. 3) o [1] exactamente como aparecen.",
+        "Mantené el contenido factual; no agregués ni eliminés datos.",
+        "1–3 párrafos. Cerrá con una idea dialécticamente abierta.",
+        "No iniciés con saludos solemnes salvo que ya estén en el original.",
+      ].join(" ")
+    },
+    { role: "user", content: `Texto:\n${truncate(draft, 2800)}` }
   ];
 }
 
+// ── Web source linkification ──────────────────────────────────
 function extractSources(webContext = "") {
   const map = new Map();
-  if (!webContext) return map;
-  const lines = String(webContext).split("\n");
-  for (const line of lines) {
-    const match = line.match(/^\[(\d+)\]\s.+\((https?:\/\/[^)]+)\)\s*$/);
-    if (match) {
-      map.set(match[1], match[2]);
-    }
+  for (const line of String(webContext).split("\n")) {
+    const m = line.match(/^\[(\d+)\]\s.+\((https?:\/\/[^)]+)\)\s*$/);
+    if (m) map.set(m[1], m[2]);
   }
   return map;
 }
@@ -146,17 +152,13 @@ function linkifySources(text = "", webContext = "") {
   if (!text || !sources.size) return text;
   return text.replace(/\[(\d+)\]/g, (full, num) => {
     const url = sources.get(num);
-    if (!url) return full;
-    return `[${num}](${url})`;
+    return url ? `[${num}](${url})` : full;
   });
 }
 
-/**
- * Llama a OpenAI con reintentos y backoff exponencial.
- */
+// ── OpenAI call with retry ────────────────────────────────────
 async function callOpenAI(payload, maxRetries = 2) {
-  let attempt = 0;
-  let delay = 800;
+  let attempt = 0, delay = 800;
   while (true) {
     try {
       const { data } = await AXIOS.post("", payload);
@@ -168,37 +170,28 @@ async function callOpenAI(payload, maxRetries = 2) {
         throw err;
       }
       await new Promise(r => setTimeout(r, delay));
-      delay *= 2; // backoff
-      attempt += 1;
+      delay *= 2;
+      attempt++;
     }
   }
 }
 
-/**
- * API pública: genera respuesta del Bot Perón
- * @param {string} message - pregunta del usuario
- * @param {string} news - texto con últimas noticias (opcional)
- * @param {string} context - fragmentos de discursos/documentos (opcional)
- */
+// ── Main export ───────────────────────────────────────────────
 async function getResponseFromGPT(message, news = "", context = "", history = "", webContext = "", options = {}) {
   const messages = buildMessages({
-    message,
-    news,
-    context,
-    history,
-    webContext,
+    message, news, context, history, webContext,
     isSmallTalk: options.isSmallTalk,
-    shortReply: options.shortReply
+    shortReply:  options.shortReply,
   });
 
   const payload = {
-    model: OPENAI_MODEL,
+    model:             OPENAI_MODEL,
     messages,
-    max_tokens: options.isSmallTalk ? 90 : options.shortReply ? 140 : 260, // más corto y estable
-    temperature: 0.4,         // menos deriva
-    top_p: 0.9,
-    presence_penalty: 0.2,    // evita repetición hueca
-    frequency_penalty: 0.3
+    max_tokens:        options.isSmallTalk ? 90 : options.shortReply ? 150 : 380,
+    temperature:       0.35,
+    top_p:             0.9,
+    presence_penalty:  0.2,
+    frequency_penalty: 0.3,
   };
 
   try {
@@ -206,33 +199,31 @@ async function getResponseFromGPT(message, news = "", context = "", history = ""
 
     if (STYLE_REWRITE_ENABLED && text && !options.shortReply && !options.isSmallTalk) {
       const rewritePayload = {
-        model: STYLE_REWRITE_MODEL,
-        messages: buildRewriteMessages(text),
-        max_tokens: STYLE_REWRITE_MAX_TOKENS,
+        model:       STYLE_REWRITE_MODEL,
+        messages:    buildRewriteMessages(text),
+        max_tokens:  STYLE_REWRITE_MAX_TOKENS,
         temperature: STYLE_REWRITE_TEMPERATURE,
-        top_p: 0.9
+        top_p:       0.9,
       };
       const rewritten = await callOpenAI(rewritePayload);
       if (rewritten) text = rewritten;
     }
 
+    // Limpiar saludos solemnes no pedidos
     if (text) {
       text = text
-        .replace(/^(\s*["'“”‘’]*\s*)?(querido|queridos)\s+(pueblo|compatriotas|argentinos|argentinas|amigos|hermanos)([^,.]{0,60})?[,\s]+/i, "")
-        .replace(/^(\s*["'“”‘’]*\s*)?(querido|queridos)\s+pueblo\s+argentino[,\s]+/i, "");
+        .replace(/^(\s*["'""'']*\s*)?(querido|queridos)\s+(pueblo|compatriotas|argentinos|argentinas|amigos|hermanos)([^,.]{0,60})?[,\s]+/i, "")
+        .replace(/^(\s*["'""'']*\s*)?(querido|queridos)\s+pueblo\s+argentino[,\s]+/i, "");
     }
-    if (text && text.length > 1200) {
-      const slice = text.slice(0, 1200);
-      const lastPeriod = Math.max(slice.lastIndexOf("."), slice.lastIndexOf("!"), slice.lastIndexOf("?"));
-      if (lastPeriod > 200) {
-        text = slice.slice(0, lastPeriod + 1);
-      } else {
-        text = truncate(text, 1200);
-      }
+
+    // Cortar si supera límite
+    if (text && text.length > 1400) {
+      const slice = text.slice(0, 1400);
+      const last  = Math.max(slice.lastIndexOf("."), slice.lastIndexOf("!"), slice.lastIndexOf("?"));
+      text = last > 200 ? slice.slice(0, last + 1) : truncate(text, 1400);
     }
-    if (text && webContext) {
-      text = linkifySources(text, webContext);
-    }
+
+    if (text && webContext) text = linkifySources(text, webContext);
     return text;
   } catch (error) {
     throw new Error("Error al generar la respuesta desde GPT");

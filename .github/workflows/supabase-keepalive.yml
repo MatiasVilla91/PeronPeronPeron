@@ -1,0 +1,32 @@
+name: Supabase Keep-Alive
+
+# Corre cada 5 días a las 8:00 UTC para evitar que Supabase pause el proyecto
+on:
+  schedule:
+    - cron: '0 8 */5 * *'
+  workflow_dispatch: # también permite correrlo manualmente desde GitHub
+
+jobs:
+  keepalive:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping marx_documents
+        run: |
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            "https://bpqlhbgbzyjkrnwziuoo.supabase.co/rest/v1/marx_documents?select=id&limit=1" \
+            -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}")
+          echo "marx_documents → HTTP $STATUS"
+          [ "$STATUS" = "200" ] || exit 1
+
+      - name: Ping peron_documents
+        run: |
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            "https://bpqlhbgbzyjkrnwziuoo.supabase.co/rest/v1/peron_documents?select=id&limit=1" \
+            -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}")
+          echo "peron_documents → HTTP $STATUS"
+          [ "$STATUS" = "200" ] || exit 1
+
+      - name: Resultado
+        run: echo "✅ Supabase activo — $(date -u '+%Y-%m-%d %H:%M UTC')"

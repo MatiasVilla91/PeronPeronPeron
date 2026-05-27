@@ -1,347 +1,238 @@
-const fs = require("fs");
+// controllers/trainController.js
+// RAG con Supabase pgvector — tabla peron_documents
+const ws = require("ws");
+const { createClient } = require("@supabase/supabase-js");
+const { embedTexts }   = require("../services/embeddingService");
+
+// ── Supabase ─────────────────────────────────────────────────
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY;
+
+if (!supabaseUrl || !supabaseKey) {
+  console.error("[trainController] Faltan SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY");
+}
+
+const supabase = supabaseUrl && supabaseKey
+  ? createClient(supabaseUrl, supabaseKey, { realtime: { transport: ws } })
+  : null;
+
+// ── Fallback: corpus local (peron_docs.json) ──────────────────
+const fs   = require("fs");
 const path = require("path");
-const { embedTexts } = require("../services/embeddingService");
 
-let peronData = [];
-let chunks = [];
-let idf = new Map();
-let avgDocLen = 0;
-const chunkEmbeddings = new Map();
-let embeddingsDirty = false;
-let embeddingsMeta = {
-    version: 1,
-    model: process.env.OPENAI_EMBEDDING_MODEL || "text-embedding-3-small",
-    fingerprint: null
-};
-
-const EMBEDDINGS_PATH = path.join(__dirname, "..", "data", "peron_embeddings.json");
+let fallbackChunks = [];
+let fallbackReady  = false;
 
 const NOISE_PATTERNS = [
-    /www\.jdperon\.gov\.ar/i,
-    /austria 2593/i,
-    /1425 buenos aires/i,
-    /instituto nacional .*per[oó]n/i,
-    /tlfs\./i,
-    /^\d+$/i,
-    /^\d+\.$/i,
-    /^[a-z]\.$/i,
-    /^[ivxlcdm]+\.$/i,
-    /^art\.$/i,
-    /^registro n\.?$/i,
-    /^documento n\.?$/i,
-    /^cit\.$/i,
-    /^cit\.,?\s*p(p)?\.$/i
+  /www\.jdperon\.gov\.ar/i,
+  /austria 2593/i,
+  /1425 buenos aires/i,
+  /instituto nacional .*per[oó]n/i,
+  /tlfs\./i,
+  /^\d+$/i,
+  /^\d+\.$/i,
+  /^[a-z]\.$/i,
+  /^[ivxlcdm]+\.$/i,
 ];
 
-const STOPWORDS = new Set([
-    "que","para","con","del","los","las","una","uno","por","como","pero","sus","nos","ya","asi","ese","esa","esto",
-    "esta","estos","estas","toda","todo","todas","todos","muy","mas","menos","hay","fue","ser","son","era","han",
-    "al","el","la","y","o","de","a","en","un","se","lo","su","si","no","mi","tu","es","me","te","le","les","ya"
-]);
-
-function normalize(text = "") {
-    return text
-        .toLowerCase()
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "");
-}
-
-function tokenize(text = "") {
-    return normalize(text)
-        .split(/[^a-z0-9]+/g)
-        .filter(token => token.length > 2 && !STOPWORDS.has(token));
-}
-
 function cleanLines(lines = []) {
-    return lines
-        .map(line => String(line).replace(/\s+/g, " ").trim())
-        .filter(line => line.length > 0)
-        .filter(line => !NOISE_PATTERNS.some((pattern) => pattern.test(line)));
+  return lines
+    .map(line => String(line).replace(/\s+/g, " ").trim())
+    .filter(line => line.length > 0)
+    .filter(line => !NOISE_PATTERNS.some(p => p.test(line)));
 }
 
 function chunkLines(lines, maxChars = 900, minChars = 240) {
-    const out = [];
-    let buffer = "";
-
-    for (const line of lines) {
-        const next = buffer ? `${buffer} ${line}` : line;
-        if (next.length > maxChars && buffer.length >= minChars) {
-            out.push(buffer);
-            buffer = line;
-            continue;
-        }
-        buffer = next;
+  const out = [];
+  let buffer = "";
+  for (const line of lines) {
+    const next = buffer ? `${buffer} ${line}` : line;
+    if (next.length > maxChars && buffer.length >= minChars) {
+      out.push(buffer);
+      buffer = line;
+    } else {
+      buffer = next;
     }
-
-    if (buffer.trim().length >= 80) {
-        out.push(buffer.trim());
-    }
-
-    return out;
+  }
+  if (buffer.trim().length >= 80) out.push(buffer.trim());
+  return out;
 }
 
-function buildIndex() {
-    const df = new Map();
-    let totalLen = 0;
-
-    for (const chunk of chunks) {
-        const tokens = tokenize(chunk.text);
-        const termFreq = new Map();
-        const unique = new Set();
-
-        for (const token of tokens) {
-            termFreq.set(token, (termFreq.get(token) || 0) + 1);
-            unique.add(token);
-        }
-
-        for (const token of unique) {
-            df.set(token, (df.get(token) || 0) + 1);
-        }
-
-        chunk.tokens = tokens;
-        chunk.termFreq = termFreq;
-        chunk.len = tokens.length || 1;
-        totalLen += chunk.len;
+function loadFallback() {
+  if (fallbackReady) return;
+  try {
+    const filePath = path.join(__dirname, "..", "data", "peron_docs.json");
+    const data     = JSON.parse(fs.readFileSync(filePath, "utf-8"));
+    for (const doc of data) {
+      const lines   = Array.isArray(doc.texto) ? doc.texto : [doc.texto];
+      const cleaned = cleanLines(lines);
+      const pieces  = chunkLines(cleaned);
+      for (const text of pieces) {
+        fallbackChunks.push({
+          content:  text,
+          obra:     doc.tema   || "Perón",
+          capitulo: doc.tipo   || "",
+          fecha:    doc.fecha  || "",
+        });
+      }
     }
-
-    avgDocLen = chunks.length ? totalLen / chunks.length : 0;
-    idf = new Map();
-    const totalDocs = chunks.length || 1;
-
-    for (const [token, freq] of df.entries()) {
-        const value = Math.log((totalDocs - freq + 0.5) / (freq + 0.5) + 1);
-        idf.set(token, value);
-    }
+    fallbackReady = true;
+    console.log(`[trainController] Fallback cargado: ${fallbackChunks.length} fragmentos`);
+  } catch (e) {
+    console.error("[trainController] Error cargando fallback:", e.message);
+  }
 }
 
-function getDocumentsFingerprint(filePath) {
-    try {
-        const stat = fs.statSync(filePath);
-        return `${stat.size}-${Math.floor(stat.mtimeMs)}`;
-    } catch (error) {
-        return null;
+// ── Helpers ───────────────────────────────────────────────────
+function cosineSim(a, b) {
+  if (!a || !b || a.length !== b.length) return 0;
+  let dot = 0, na = 0, nb = 0;
+  for (let i = 0; i < a.length; i++) {
+    dot += a[i] * b[i];
+    na  += a[i] * a[i];
+    nb  += b[i] * b[i];
+  }
+  return na && nb ? dot / (Math.sqrt(na) * Math.sqrt(nb)) : 0;
+}
+
+function normalize(text = "") {
+  return text.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+}
+
+function tokenize(text = "") {
+  const STOP = new Set([
+    "que","para","con","del","los","las","una","uno","por","como","pero","sus",
+    "nos","ya","asi","ese","esa","esto","esta","toda","todo","hay","fue","ser",
+    "son","era","han","al","el","la","y","o","de","a","en","un","se","lo","su",
+    "si","no","mi","tu","es","me","te","le","les","the","and","or","of","in",
+    "to","is","that","it","this","was","for","on","are","with","as","at"
+  ]);
+  return normalize(text)
+    .split(/[^a-z0-9]+/)
+    .filter(t => t.length > 2 && !STOP.has(t));
+}
+
+function bm25Score(queryTokens, text) {
+  const k1 = 1.2, b = 0.75, avgLen = 200;
+  const tokens = tokenize(text);
+  const freq   = new Map();
+  for (const t of tokens) freq.set(t, (freq.get(t) || 0) + 1);
+  let score = 0;
+  for (const qt of queryTokens) {
+    const tf = freq.get(qt) || 0;
+    if (!tf) continue;
+    const norm = tf + k1 * (1 - b + b * (tokens.length / avgLen));
+    score += (tf * (k1 + 1)) / (norm || 1);
+  }
+  return score;
+}
+
+function mmrSelect(candidates, queryEmb, topK, lambda = 0.7) {
+  const selected = [];
+  const pool     = candidates.slice();
+  while (selected.length < topK && pool.length) {
+    let bestIdx = 0, bestScore = -Infinity;
+    for (let i = 0; i < pool.length; i++) {
+      const simQ = queryEmb && pool[i].embedding
+        ? cosineSim(queryEmb, pool[i].embedding) : pool[i].bm25 || 0;
+      let maxSel = 0;
+      for (const s of selected) {
+        const sim = pool[i].embedding && s.embedding
+          ? cosineSim(pool[i].embedding, s.embedding) : 0;
+        if (sim > maxSel) maxSel = sim;
+      }
+      const score = lambda * simQ - (1 - lambda) * maxSel;
+      if (score > bestScore) { bestScore = score; bestIdx = i; }
     }
+    selected.push(...pool.splice(bestIdx, 1));
+  }
+  return selected;
 }
 
-function loadEmbeddingsCache(fingerprint) {
-    try {
-        if (!fs.existsSync(EMBEDDINGS_PATH)) return;
-        const raw = fs.readFileSync(EMBEDDINGS_PATH, "utf-8");
-        const parsed = JSON.parse(raw || "{}");
-
-        if (!parsed || parsed.version !== 1) return;
-        if (parsed.model && parsed.model !== embeddingsMeta.model) return;
-        if (parsed.fingerprint && parsed.fingerprint !== fingerprint) return;
-
-        const items = parsed.items || {};
-        for (const [id, vector] of Object.entries(items)) {
-            if (Array.isArray(vector) && vector.length) {
-                chunkEmbeddings.set(Number(id), vector);
-            }
-        }
-    } catch (error) {
-        console.warn("No se pudo cargar el cache de embeddings:", error.message);
-    }
+function formatChunk(row) {
+  const parts = [row.obra, row.volumen, row.capitulo, row.seccion, row.fecha]
+    .filter(Boolean).join(" · ");
+  return parts
+    ? `[${parts}]\n${row.content}`
+    : row.content;
 }
 
-function saveEmbeddingsCache() {
-    if (!embeddingsDirty) return;
-    try {
-        const items = {};
-        for (const [id, vector] of chunkEmbeddings.entries()) {
-            items[id] = vector;
-        }
-
-        const payload = {
-            version: embeddingsMeta.version,
-            model: embeddingsMeta.model,
-            fingerprint: embeddingsMeta.fingerprint,
-            items
-        };
-
-        const tmpPath = `${EMBEDDINGS_PATH}.tmp`;
-        fs.writeFileSync(tmpPath, JSON.stringify(payload));
-        fs.renameSync(tmpPath, EMBEDDINGS_PATH);
-        embeddingsDirty = false;
-    } catch (error) {
-        console.warn("No se pudo guardar el cache de embeddings:", error.message);
-    }
-}
-
-function loadDocuments() {
-    try {
-        const filePath = path.join(__dirname, "..", "data", "peron_docs.json");
-        const data = fs.readFileSync(filePath, "utf-8");
-        peronData = JSON.parse(data);
-
-        chunks = [];
-        let chunkId = 0;
-
-        for (const doc of peronData) {
-            const lines = Array.isArray(doc.texto) ? doc.texto : [doc.texto];
-            const cleaned = cleanLines(lines);
-            const pieces = chunkLines(cleaned);
-
-            for (const text of pieces) {
-                chunks.push({
-                    id: chunkId++,
-                    text,
-                    tema: doc.tema || "General",
-                    fecha: doc.fecha || "Desconocida",
-                    tipo: doc.tipo || "discurso",
-                    autor: doc.autor || "Juan Domingo Perón"
-                });
-            }
-        }
-
-        const fingerprint = getDocumentsFingerprint(filePath);
-        embeddingsMeta.fingerprint = fingerprint;
-        loadEmbeddingsCache(fingerprint);
-        buildIndex();
-        console.log(`Documentos cargados correctamente. Fragmentos: ${chunks.length}`);
-    } catch (error) {
-        console.error("Error al cargar documentos:", error.message);
-    }
-}
-
-function lexicalScore(queryTokens, chunk) {
-    let score = 0;
-    const k1 = 1.2;
-    const b = 0.75;
-
-    for (const token of queryTokens) {
-        const tf = chunk.termFreq.get(token);
-        if (!tf) continue;
-        const weight = idf.get(token) || 0;
-        const norm = tf + k1 * (1 - b + b * (chunk.len / (avgDocLen || 1)));
-        score += weight * ((tf * (k1 + 1)) / (norm || 1));
-    }
-    return score;
-}
-
-function cosineSimilarity(a = [], b = []) {
-    if (!a.length || !b.length || a.length !== b.length) return 0;
-    let dot = 0;
-    let normA = 0;
-    let normB = 0;
-    for (let i = 0; i < a.length; i += 1) {
-        dot += a[i] * b[i];
-        normA += a[i] * a[i];
-        normB += b[i] * b[i];
-    }
-    if (!normA || !normB) return 0;
-    return dot / (Math.sqrt(normA) * Math.sqrt(normB));
-}
-
-function formatContext(chunk) {
-    const meta = [chunk.tipo, chunk.fecha, chunk.tema].filter(Boolean).join(" · ");
-    const prefix = meta ? `[${meta}] ` : "";
-    return `${prefix}${chunk.text}`;
-}
-
-function mmrSelect(candidates = [], queryEmbedding, topK, lambda = 0.75) {
-    if (!queryEmbedding || !candidates.length) return [];
-    const selected = [];
-    const remaining = candidates.slice();
-
-    while (selected.length < topK && remaining.length) {
-        let bestIndex = 0;
-        let bestScore = -Infinity;
-
-        for (let i = 0; i < remaining.length; i += 1) {
-            const candidate = remaining[i];
-            const emb = candidate.embedding;
-            const simToQuery = emb ? cosineSimilarity(queryEmbedding, emb) : 0;
-            let maxSimToSelected = 0;
-
-            for (const picked of selected) {
-                const sim = emb && picked.embedding ? cosineSimilarity(emb, picked.embedding) : 0;
-                if (sim > maxSimToSelected) maxSimToSelected = sim;
-            }
-
-            const score = lambda * simToQuery - (1 - lambda) * maxSimToSelected;
-            if (score > bestScore) {
-                bestScore = score;
-                bestIndex = i;
-            }
-        }
-
-        const [picked] = remaining.splice(bestIndex, 1);
-        selected.push(picked);
-    }
-
-    return selected;
-}
-
+// ── Función principal ─────────────────────────────────────────
 async function getRelevantContext(message, options = {}) {
-    const { topK = 4, candidateK = 40 } = options;
-    if (!message || !chunks.length) return "";
+  const { topK = 5, candidateK = 30 } = options;
+  if (!message) return "";
 
-    const queryTokens = tokenize(message);
-    if (!queryTokens.length) return "";
-
-    const scored = chunks
-        .map((chunk) => ({ chunk, score: lexicalScore(queryTokens, chunk) }))
-        .filter((item) => item.score > 0)
-        .sort((a, b) => b.score - a.score)
-        .slice(0, candidateK);
-
-    if (!scored.length) return "";
-
-    if (!process.env.OPENAI_API_KEY) {
-        return scored.slice(0, topK).map(({ chunk }) => formatContext(chunk)).join("\n\n");
-    }
-
-    let queryEmbedding = null;
+  // ── Intento 1: Supabase pgvector ──────────────────────────
+  if (supabase) {
     try {
-        const [vector] = await embedTexts([message]);
-        queryEmbedding = vector;
-    } catch (error) {
-        return scored.slice(0, topK).map(({ chunk }) => formatContext(chunk)).join("\n\n");
+      const [queryEmbedding] = await embedTexts([message]);
+
+      const { data, error } = await supabase.rpc("match_peron_documents", {
+        query_embedding: queryEmbedding,
+        match_count:     candidateK,
+        min_similarity:  0.1,
+      });
+
+      if (error) throw error;
+      if (!data || data.length === 0) throw new Error("no results");
+
+      // Reranking híbrido: 70% semántico + 30% BM25
+      const queryTokens = tokenize(message);
+      const scored = data.map(row => ({
+        ...row,
+        bm25:     bm25Score(queryTokens, row.content),
+        semantic: row.similarity || 0,
+      }));
+
+      const maxBm25 = Math.max(...scored.map(r => r.bm25), 0.001);
+      for (const r of scored) {
+        r.combined = 0.7 * r.semantic + 0.3 * (r.bm25 / maxBm25);
+      }
+      scored.sort((a, b) => b.combined - a.combined);
+
+      const selected = scored.slice(0, topK);
+      return selected.map(formatChunk).join("\n\n");
+
+    } catch (err) {
+      console.warn("[trainController] pgvector falló, usando fallback:", err.message);
     }
+  }
 
-    if (!queryEmbedding) {
-        return scored.slice(0, topK).map(({ chunk }) => formatContext(chunk)).join("\n\n");
-    }
+  // ── Fallback: corpus local ────────────────────────────────
+  loadFallback();
+  if (!fallbackChunks.length) return "";
 
-    const missing = scored
-        .map(({ chunk }) => chunk)
-        .filter((chunk) => !chunkEmbeddings.has(chunk.id));
+  const queryTokens = tokenize(message);
+  if (!queryTokens.length) return "";
 
-    if (missing.length) {
-        try {
-            const vectors = await embedTexts(missing.map((chunk) => chunk.text));
-            for (let i = 0; i < missing.length; i += 1) {
-                if (vectors[i]) {
-                    chunkEmbeddings.set(missing[i].id, vectors[i]);
-                    embeddingsDirty = true;
-                }
-            }
-            saveEmbeddingsCache();
-        } catch (error) {
-            return scored.slice(0, topK).map(({ chunk }) => formatContext(chunk)).join("\n\n");
-        }
-    }
+  let queryEmb = null;
+  try {
+    const [v] = await embedTexts([message]);
+    queryEmb = v;
+  } catch (_) {}
 
-    const candidates = scored.map(({ chunk, score }) => {
-        const embedding = chunkEmbeddings.get(chunk.id);
-        const semantic = embedding ? cosineSimilarity(queryEmbedding, embedding) : 0;
-        return { chunk, embedding, semantic, lexical: score };
-    });
+  const scored = fallbackChunks
+    .map(chunk => ({
+      ...chunk,
+      embedding: null,
+      bm25: bm25Score(queryTokens, chunk.content),
+    }))
+    .filter(c => c.bm25 > 0)
+    .sort((a, b) => b.bm25 - a.bm25)
+    .slice(0, candidateK);
 
-    const selected = mmrSelect(candidates, queryEmbedding, topK, 0.75);
-    const reranked = selected.length
-        ? selected
-        : candidates
-            .sort((a, b) => {
-                if (b.semantic === a.semantic) return b.lexical - a.lexical;
-                return b.semantic - a.semantic;
-            })
-            .slice(0, topK);
+  if (!scored.length) return "";
 
-    const output = reranked.map(({ chunk }) => formatContext(chunk));
+  const selected = mmrSelect(scored, queryEmb, topK);
+  return selected.map(c => {
+    const meta = [c.obra, c.capitulo, c.fecha].filter(Boolean).join(" · ");
+    return meta ? `[${meta}]\n${c.content}` : c.content;
+  }).join("\n\n");
+}
 
-    return output.join("\n\n");
+// Mantener compatibilidad con server.js
+function loadDocuments() {
+  loadFallback();
 }
 
 module.exports = { loadDocuments, getRelevantContext };

@@ -1,4 +1,3 @@
-@"
 # Node
 node_modules/
 dist/
@@ -21,9 +20,17 @@ coverage/
 *.sublime-workspace
 .DS_Store
 Thumbs.db
-"@ | Out-File -Encoding utf8 .gitignore
 
+# Archivos con claves — nunca subir
+MARX_env.txt
+*.env*
 
+# PDFs y archivos pesados
+docs/*.pdf
+
+# Audio
 *.wav
+
+# Frontend env
 frontend/.env.local
 frontend/.env
